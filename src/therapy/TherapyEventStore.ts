@@ -5,7 +5,7 @@ import { EventData, jsonEvent, JSONEventType } from '@eventstore/db-client';
 import EventStoreEvent from '@helper/EventStoreEvent';
 import Guid from '@helper/Guid';
 
-import { MedicationAddedToTherapy, TherapyCreated } from './TherapyEvents';
+import { MedicationAddedToTherapy, MedicationRemovedFromTherapy, TherapyCreated } from './TherapyEvents';
 
 interface EventStoreAdapter<E extends EventStoreEvent, D extends TherapyEvents> {
     eventData(event: E): EventData
@@ -25,17 +25,23 @@ type MedicationAddedToTherapyEvent = JSONEventType<"medication-added-to-therapy"
     route: string;
     frequency: string;
 }>;
-type TherapyEvents = TherapyCreatedEvent | MedicationAddedToTherapyEvent;
+type MedicationRemovedFromTherapyEvent = JSONEventType<"medication-removed-from-therapy", {
+    therapyId: string;
+    medicationId: string;
+}>;
+type TherapyEvents = TherapyCreatedEvent | MedicationAddedToTherapyEvent | MedicationRemovedFromTherapyEvent;
 
 export class TherapyEventStore {
     eventData(event: EventStoreEvent): EventData {
         if (event instanceof TherapyCreated) return this.therapyCreated.eventData(event);
         if (event instanceof MedicationAddedToTherapy) return this.medicationAddedToTherapy.eventData(event);
+        if (event instanceof MedicationRemovedFromTherapy) return this.medicationRemovedFromTherapy.eventData(event);
         throw new Error();
     }
     event(event: TherapyEvents): EventStoreEvent {
         if (event.type === "therapy-created") return this.therapyCreated.event(event.data);
         if (event.type === "medication-added-to-therapy") return this.medicationAddedToTherapy.event(event.data)
+        if (event.type === "medication-removed-from-therapy") return this.medicationRemovedFromTherapy.event(event.data)
         throw new Error();
     }
 
@@ -48,14 +54,12 @@ export class TherapyEventStore {
     private get medicationAddedToTherapy(): EventStoreAdapter<MedicationAddedToTherapy, MedicationAddedToTherapyEvent> {
         return {
             eventData: (event) => eventData("medication-added-to-therapy", {
-
                 therapyId: event.therapyId.toString(),
                 medicationId: event.medication.medicationId.toString(),
                 strength: event.medication.strength,
                 amount: event.medication.amount,
                 route: event.medication.route.toString(),
-                frequency: event.medication.frequency.toString(),
-
+                frequency: event.medication.frequency.toString()
             }),
             event: (data) => new MedicationAddedToTherapy(new Guid(data.therapyId), new MedicationConsumption(
                 new Guid(data.therapyId),
@@ -64,6 +68,15 @@ export class TherapyEventStore {
                 ConsumptionRoute.create(data.route),
                 ConsumptionFrequency.create(data.frequency),
             ))
+        }
+    }
+    private get medicationRemovedFromTherapy(): EventStoreAdapter<MedicationRemovedFromTherapy, MedicationRemovedFromTherapyEvent> {
+        return {
+            eventData: (event) => eventData("medication-removed-from-therapy", {
+                therapyId: event.therapyId.toString(),
+                medicationId: event.medicationId.toString(),
+            }),
+            event: (data) => new MedicationRemovedFromTherapy(new Guid(data.therapyId), new Guid(data.medicationId))
         }
     }
 }

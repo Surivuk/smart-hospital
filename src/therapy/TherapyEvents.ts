@@ -8,3 +8,6 @@ export class TherapyCreated implements EventStoreEvent {
 export class MedicationAddedToTherapy implements EventStoreEvent {
     constructor(public readonly therapyId: Guid, public readonly medication: MedicationConsumption) { }
 }
+export class MedicationRemovedFromTherapy implements EventStoreEvent {
+    constructor(public readonly therapyId: Guid, public readonly medicationId: Guid) { }
+}
