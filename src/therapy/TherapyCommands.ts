@@ -3,7 +3,7 @@ import MedicationConsumption from "@app/medication/MedicationConsumption";
 import Guid from "@helper/Guid";
 
 export class CreateTherapy implements ChainCommand {
-    constructor(public readonly medicalCardId: Guid, public readonly medications: MedicationConsumption[]) { }
+    constructor(public readonly therapyID: Guid, public readonly medications: MedicationConsumption[]) { }
 }
 export class AddMedicationToTherapy implements ChainCommand {
     constructor(public readonly therapyId: Guid, public readonly medication: MedicationConsumption) { }
