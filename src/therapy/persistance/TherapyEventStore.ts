@@ -16,7 +16,7 @@ function eventData<T extends TherapyEvents["type"], D extends TherapyEvents["dat
     return jsonEvent<TherapyEvents>({ type, data })
 }
 
-type TherapyCreatedEvent = JSONEventType<"therapy-created", { therapyId: string; }>;
+type TherapyCreatedEvent = JSONEventType<"therapy-created", { therapyId: string; medicalCardId: string; }>;
 type MedicationAddedToTherapyEvent = JSONEventType<"medication-added-to-therapy", {
     therapyId: string;
     medicationId: string;
@@ -47,8 +47,8 @@ export class TherapyEventStore {
 
     private get therapyCreated(): EventStoreAdapter<TherapyCreated, TherapyCreatedEvent> {
         return {
-            eventData: (event) => eventData("therapy-created", { therapyId: event.therapyId.toString() }),
-            event: (data) => new TherapyCreated(new Guid(data.therapyId))
+            eventData: (event) => eventData("therapy-created", { therapyId: event.therapyId.toString(), medicalCardId: event.medicalCardId.toString() }),
+            event: (data) => new TherapyCreated(new Guid(data.therapyId), new Guid(data.medicalCardId))
         }
     }
     private get medicationAddedToTherapy(): EventStoreAdapter<MedicationAddedToTherapy, MedicationAddedToTherapyEvent> {

@@ -10,7 +10,7 @@ import ConsumptionRoute from "./medication/ConsumptionRoute";
 import MedicationConsumption from "./medication/MedicationConsumption";
 import ESTherapyRepository from "./therapy/persistance/ESTherapyRepository";
 import { TherapyEventStore } from "./therapy/persistance/TherapyEventStore";
-import { AddMedicationToTherapy } from "./therapy/TherapyCommands";
+import { AddMedicationToTherapy, CreateTherapy } from "./therapy/TherapyCommands";
 import TherapyProcessors from "./therapy/TherapyProcessors";
 
 const client = EventStoreDBClient.connectionString("esdb://127.0.0.1:2113?tls=false")
@@ -29,7 +29,7 @@ treatmentProcessors.register(chain)
 
 
 async function main() {
-    // chain.process(new CreateTherapy([new MedicationConsumption(
+    // chain.process(new CreateTherapy(MEDICAL_CARD, [new MedicationConsumption(
     //     GuidFactory.guid(),
     //     500,
     //     2,
@@ -50,7 +50,7 @@ async function main() {
     //         ConsumptionFrequency.create("four times a day")
     //     )))
     // chain.process(new CreateHospitalTreatment(MEDICAL_CARD, DOCTOR))
-    chain.process(new AddTherapyToTreatment(new Guid("f7871cdc677184fc073618d7f180a67d"), new Guid("cf4b3a188b6e412f979641cc6f62c9e1")))
+    // chain.process(new AddTherapyToTreatment(new Guid("f7871cdc677184fc073618d7f180a67d"), new Guid("cf4b3a188b6e412f979641cc6f62c9e1")))
 }
 
 main().catch((err) => console.log(err))

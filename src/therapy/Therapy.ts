@@ -11,11 +11,15 @@ export default class Therapy extends AggregateRoot {
 
     private _medications: Map<string, MedicationConsumption> = new Map();
 
-    static create(id: Guid): Therapy {
+    static create(id: Guid, medicalCardId: Guid): Therapy {
         const therapy = new Therapy();
-        therapy.setId(id)
+        therapy.createTherapy(id, medicalCardId)
         return therapy;
     }
+    private createTherapy(id: Guid, medicalCardId: Guid) {
+        this.applyChange(new TherapyCreated(id, medicalCardId))
+    }
+
     addMedication(medication: MedicationConsumption) {
         if (this._medications.has(medication.medicationId.toString()))
             throw new MedicationAlreadyIncludedInTherapy(`Medication Id: "${medication.medicationId.toString()}"`)
@@ -32,9 +36,6 @@ export default class Therapy extends AggregateRoot {
         if (event instanceof MedicationRemovedFromTherapy) this.applyMedicationRemovedFromTherapy(event)
     }
 
-    private setId(id: Guid) {
-        this.applyChange(new TherapyCreated(id))
-    }
     private applyTherapyCreated(event: TherapyCreated) {
         this._id = event.therapyId;
     }

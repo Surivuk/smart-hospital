@@ -10,7 +10,7 @@ export default class TherapyProcessors {
     register(chain: CommandChain): CommandChain {
         return chain
             .registerProcessor<CreateTherapy>(CreateTherapy.name, async (command) => {
-                const therapy = Therapy.create(GuidFactory.guid())
+                const therapy = Therapy.create(GuidFactory.guid(), command.medicalCardId)
                 command.medications.forEach(medication => therapy.addMedication(medication));
                 await this._repository.save(therapy)
             })

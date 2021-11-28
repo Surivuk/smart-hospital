@@ -1,3 +1,6 @@
-export default interface DomainEvent { }
+import { DomainEvent } from "@app/EventBus";
+import Guid from "@helper/Guid";
 
-export class HospitalTreatmentCreated implements DomainEvent { }
+export class TherapyCreated implements DomainEvent {
+    constructor(public readonly therapyId: Guid, public readonly medicalCardId: Guid) { }
+}
