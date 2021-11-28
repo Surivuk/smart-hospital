@@ -5,7 +5,7 @@ import { EventData, jsonEvent, JSONEventType } from '@eventstore/db-client';
 import EventStoreEvent from '@helper/EventStoreEvent';
 import Guid from '@helper/Guid';
 
-import { MedicationAddedToTherapy, MedicationRemovedFromTherapy, TherapyCreated } from './TherapyEvents';
+import { MedicationAddedToTherapy, MedicationRemovedFromTherapy, TherapyCreated } from '../TherapyEvents';
 
 interface EventStoreAdapter<E extends EventStoreEvent, D extends TherapyEvents> {
     eventData(event: E): EventData
@@ -29,7 +29,7 @@ type MedicationRemovedFromTherapyEvent = JSONEventType<"medication-removed-from-
     therapyId: string;
     medicationId: string;
 }>;
-type TherapyEvents = TherapyCreatedEvent | MedicationAddedToTherapyEvent | MedicationRemovedFromTherapyEvent;
+export type TherapyEvents = TherapyCreatedEvent | MedicationAddedToTherapyEvent | MedicationRemovedFromTherapyEvent;
 
 export class TherapyEventStore {
     eventData(event: EventStoreEvent): EventData {
