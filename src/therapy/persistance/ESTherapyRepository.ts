@@ -31,7 +31,7 @@ export default class ESTherapyRepository implements TherapyRepository {
     }
 
     private streamName(therapyId: Guid): string {
-        return `therapy_${therapyId.toString()}`
+        return `therapy-${therapyId.toString()}`
     }
     private uncommittedEvents(therapy: Therapy): EventData[] {
         return therapy.uncommittedChanges().map(event => this._eventStore.eventData(event))
