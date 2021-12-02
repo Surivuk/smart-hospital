@@ -28,6 +28,7 @@
     "typescript": "^4.4.4"
   },
   "dependencies": {
-    "@eventstore/db-client": "^2.1.1"
+    "@eventstore/db-client": "^2.1.1",
+    "redis": "^4.0.0"
   }
 }

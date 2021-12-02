@@ -10,12 +10,16 @@ import { HospitalTreatmentEventStore } from "./hospitalTreatment/persistance/Hos
 import ConsumptionFrequency from "./medication/ConsumptionFrequency";
 import ConsumptionRoute from "./medication/ConsumptionRoute";
 import MedicationConsumption from "./medication/MedicationConsumption";
+import HospitalTreatmentsReadService from "./services/HospitalTreatmentsReadService";
 import ESTherapyRepository from "./therapy/persistance/ESTherapyRepository";
 import { TherapyEventStore } from "./therapy/persistance/TherapyEventStore";
 import { AddMedicationToTherapy, CreateTherapy } from "./therapy/TherapyCommands";
 import TherapyProcessors from "./therapy/TherapyProcessors";
+import { createClient } from "redis"
 
 const client = EventStoreDBClient.connectionString("esdb://127.0.0.1:2113?tls=false")
+
+
 
 const MEDICAL_CARD = new Guid("0a710cab-576b-4263-bf70-40e2ff203489");
 const DOCTOR = new Guid("3c3c4f8f-4cd0-4dc6-876c-9846643df8e9");
@@ -34,22 +38,28 @@ const chain = new CommandChain();
 processors.register(chain)
 treatmentProcessors.register(chain)
 
+const redisClient = createClient();
+redisClient.on('error', (err) => console.log('Redis Client Error', err));
 
 async function main() {
+    await redisClient.connect();
+    new HospitalTreatmentsReadService().read(client, redisClient)
+
+
     // await chain.process(new CreateHospitalTreatment(MEDICAL_CARD, DOCTOR))
-    await chain.process(new CreateTherapy(new Guid("ce2fbb515db8f4361b6d594b9f730efd"), [new MedicationConsumption(
-        GuidFactory.guid(),
-        500,
-        2,
-        ConsumptionRoute.create("PO (by mouth)"),
-        ConsumptionFrequency.create("twice a day")
-    ), new MedicationConsumption(
-        GuidFactory.guid(),
-        1000,
-        1,
-        ConsumptionRoute.create("PO (by mouth)"),
-        ConsumptionFrequency.create("daily")
-    )]))
+    // await chain.process(new CreateTherapy(new Guid("ce2fbb515db8f4361b6d594b9f730efd"), [new MedicationConsumption(
+    //     GuidFactory.guid(),
+    //     500,
+    //     2,
+    //     ConsumptionRoute.create("PO (by mouth)"),
+    //     ConsumptionFrequency.create("twice a day")
+    // ), new MedicationConsumption(
+    //     GuidFactory.guid(),
+    //     1000,
+    //     1,
+    //     ConsumptionRoute.create("PO (by mouth)"),
+    //     ConsumptionFrequency.create("daily")
+    // )]))
     // chain.process(new AddMedicationToTherapy(new Guid("cf4b3a188b6e412f979641cc6f62c9e1"), new MedicationConsumption(
     //         GuidFactory.guid(),
     //         100,
@@ -62,3 +72,5 @@ async function main() {
 }
 
 main().catch((err) => console.log(err))
+
+

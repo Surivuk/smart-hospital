@@ -14,8 +14,8 @@ function eventData<T extends HospitalTreatmentEvents["type"], D extends Hospital
     return jsonEvent<HospitalTreatmentEvents>({ type, data })
 }
 
-type HospitalTreatmentCreatedEvent = JSONEventType<"hospital-treatment-created", { treatmentId: string; medicalCardId: string; doctorId: string; }>;
-type TherapyAddedToHospitalTreatmentEvent = JSONEventType<"therapy-added-to-treatment", {
+export type HospitalTreatmentCreatedEvent = JSONEventType<"hospital-treatment-created", { treatmentId: string; medicalCardId: string; doctorId: string; }>;
+export type TherapyAddedToHospitalTreatmentEvent = JSONEventType<"therapy-added-to-treatment", {
     treatmentId: string;
     therapyId: string;
 }>;
