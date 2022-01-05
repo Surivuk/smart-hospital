@@ -1,5 +1,5 @@
 import { AggregateRoot } from "./AggregateRoot";
-import { EventStoreEvent } from "./EventStoreEvent"
+import EventStoreEvent from "./EventStoreEvent"
 
 export interface AggregateRootTestFixtureMethods<T extends AggregateRoot> {
     root(): T;

@@ -12,8 +12,8 @@ module.exports = {
     "^.+\\.(ts|tsx)?$": "ts-jest",
   },
   moduleNameMapper: {
-    "^@environment/(.*)$": "<rootDir>/environment/$1",
-    "^@domain/(.*)$": "<rootDir>/src/domain/$1",
+    "^@app/(.*)$": "<rootDir>/src/$1",
+    "^@helper/(.*)$": "<rootDir>/src/helper/$1",
   },
   collectCoverage: true,
   globals: {
