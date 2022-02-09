@@ -1,7 +1,7 @@
 import {
     HospitalTreatmentCreatedEvent,
     TherapyAddedToHospitalTreatmentEvent,
-} from '@app/hospitalTreatment/persistance/HospitalTreatmentEventStore';
+} from '@app/medication/hospitalTreatment/persistance/HospitalTreatmentEventStore';
 import { EventStoreDBClient, START, streamNameFilter } from '@eventstore/db-client';
 import { RedisClientType } from '@node-redis/client/dist/lib/client';
 

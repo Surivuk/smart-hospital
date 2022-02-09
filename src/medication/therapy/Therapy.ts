@@ -1,4 +1,4 @@
-import MedicationConsumption from '@app/medication/MedicationConsumption';
+import MedicamentConsumption from '@medication/medicamentConsumtion/MedicamentConsumption';
 import { AggregateRoot } from '@helper/AggregateRoot';
 import EventStoreEvent from '@helper/EventStoreEvent';
 import Guid from '@helper/Guid';
@@ -9,7 +9,7 @@ export class MedicationAlreadyIncludedInTherapy extends Error { }
 
 export default class Therapy extends AggregateRoot {
 
-    private _medications: Map<string, MedicationConsumption> = new Map();
+    private _medications: Map<string, MedicamentConsumption> = new Map();
 
     static create(id: Guid, medicalCardId: Guid): Therapy {
         const therapy = new Therapy();
@@ -20,9 +20,9 @@ export default class Therapy extends AggregateRoot {
         this.applyChange(new TherapyCreated(id, medicalCardId))
     }
 
-    addMedication(medication: MedicationConsumption) {
-        if (this._medications.has(medication.medicationId.toString()))
-            throw new MedicationAlreadyIncludedInTherapy(`Medication Id: "${medication.medicationId.toString()}"`)
+    addMedication(medication: MedicamentConsumption) {
+        if (this._medications.has(medication.medicamentId.toString()))
+            throw new MedicationAlreadyIncludedInTherapy(`Medication Id: "${medication.medicamentId.toString()}"`)
         this.applyChange(new MedicationAddedToTherapy(this.id, medication))
     }
     removeMedication(medicationId: Guid) {
@@ -40,7 +40,7 @@ export default class Therapy extends AggregateRoot {
         this._id = event.therapyId;
     }
     private applyMedicationAdded(event: MedicationAddedToTherapy) {
-        this._medications.set(event.medication.medicationId.toString(), event.medication);
+        this._medications.set(event.medication.medicamentId.toString(), event.medication);
     }
     private applyMedicationRemovedFromTherapy(event: MedicationRemovedFromTherapy) {
         this._medications.delete(event.medicationId.toString());

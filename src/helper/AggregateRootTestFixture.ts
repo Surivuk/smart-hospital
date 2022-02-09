@@ -20,5 +20,5 @@ export function aggregateRootTestFixture<T extends AggregateRoot>({ root: create
     catch (err) {
         error = err
     }
-    return { events: error === undefined ? Array.from(root.uncommittedChanges()) : [], error }
+    return { events: Array.from(root.uncommittedChanges()), error }
 }

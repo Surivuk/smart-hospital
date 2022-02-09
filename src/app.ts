@@ -2,19 +2,17 @@ import { EventStoreDBClient } from "@eventstore/db-client";
 import Guid, { GuidFactory } from "@helper/Guid";
 import CommandChain from "./CommandChain";
 import EventBus from "./EventBus";
-import { AddTherapyToTreatment, CreateHospitalTreatment } from "./hospitalTreatment/HospitalTreatmentCommands";
-import HospitalTreatmentEventHandlers from "./hospitalTreatment/HospitalTreatmentEventHandlers";
-import HospitalTreatmentProcessors from "./hospitalTreatment/HospitalTreatmentProcessors";
-import ESHospitalTreatmentRepository from "./hospitalTreatment/persistance/ESHospitalTreatmentRepository";
-import { HospitalTreatmentEventStore } from "./hospitalTreatment/persistance/HospitalTreatmentEventStore";
-import ConsumptionFrequency from "./medication/ConsumptionFrequency";
-import ConsumptionRoute from "./medication/ConsumptionRoute";
-import MedicationConsumption from "./medication/MedicationConsumption";
+
+import ESHospitalTreatmentRepository from "./medication/hospitalTreatment/persistance/ESHospitalTreatmentRepository";
+import { HospitalTreatmentEventStore } from "./medication/hospitalTreatment/persistance/HospitalTreatmentEventStore";
+import ConsumptionFrequency from "./medication/medicamentConsumtion/ConsumptionFrequency";
+import ConsumptionRoute from "./medication/medicamentConsumtion/ConsumptionRoute";
+import MedicamentConsumption from "./medication/medicamentConsumtion/MedicamentConsumption";
 import HospitalTreatmentsReadService from "./services/HospitalTreatmentsReadService";
-import ESTherapyRepository from "./therapy/persistance/ESTherapyRepository";
-import { TherapyEventStore } from "./therapy/persistance/TherapyEventStore";
-import { AddMedicationToTherapy, CreateTherapy } from "./therapy/TherapyCommands";
-import TherapyProcessors from "./therapy/TherapyProcessors";
+import ESTherapyRepository from "./medication/therapy/persistance/ESTherapyRepository";
+import { TherapyEventStore } from "./medication/therapy/persistance/TherapyEventStore";
+import { AddMedicationToTherapy, CreateTherapy } from "./medication/therapy/TherapyCommands";
+import TherapyProcessors from "./medication/therapy/TherapyProcessors";
 import { createClient } from "redis"
 
 const client = EventStoreDBClient.connectionString("esdb://127.0.0.1:2113?tls=false")
@@ -29,14 +27,14 @@ const eventBus = new EventBus()
 const repo = new ESTherapyRepository(client, new TherapyEventStore())
 const treatmentRepo = new ESHospitalTreatmentRepository(client, new HospitalTreatmentEventStore())
 const processors = new TherapyProcessors(repo, eventBus);
-const treatmentProcessors = new HospitalTreatmentProcessors(treatmentRepo)
-const treatmentHandlers = new HospitalTreatmentEventHandlers(treatmentRepo)
+// const treatmentProcessors = new HospitalTreatmentProcessors(treatmentRepo)
+// const treatmentHandlers = new HospitalTreatmentEventHandlers(treatmentRepo)
 
-treatmentHandlers.register(eventBus)
+// treatmentHandlers.register(eventBus)
 
 const chain = new CommandChain();
 processors.register(chain)
-treatmentProcessors.register(chain)
+// treatmentProcessors.register(chain)
 
 const redisClient = createClient();
 redisClient.on('error', (err) => console.log('Redis Client Error', err));

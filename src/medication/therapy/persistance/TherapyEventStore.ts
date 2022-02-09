@@ -1,6 +1,6 @@
-import ConsumptionFrequency from '@app/medication/ConsumptionFrequency';
-import ConsumptionRoute from '@app/medication/ConsumptionRoute';
-import MedicationConsumption from '@app/medication/MedicationConsumption';
+import ConsumptionFrequency from '@medication/medicamentConsumtion/ConsumptionFrequency';
+import ConsumptionRoute from '@medication/medicamentConsumtion/ConsumptionRoute';
+import MedicamentConsumption from '@medication/medicamentConsumtion/MedicamentConsumption';
 import { EventData, jsonEvent, JSONEventType } from '@eventstore/db-client';
 import EventStoreEvent from '@helper/EventStoreEvent';
 import Guid from '@helper/Guid';
@@ -55,13 +55,13 @@ export class TherapyEventStore {
         return {
             eventData: (event) => eventData("medication-added-to-therapy", {
                 therapyId: event.therapyId.toString(),
-                medicationId: event.medication.medicationId.toString(),
+                medicationId: event.medication.medicamentId.toString(),
                 strength: event.medication.strength,
                 amount: event.medication.amount,
                 route: event.medication.route.toString(),
                 frequency: event.medication.frequency.toString()
             }),
-            event: (data) => new MedicationAddedToTherapy(new Guid(data.therapyId), new MedicationConsumption(
+            event: (data) => new MedicationAddedToTherapy(new Guid(data.therapyId), new MedicamentConsumption(
                 new Guid(data.therapyId),
                 data.strength,
                 data.amount,

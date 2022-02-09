@@ -2,9 +2,9 @@ import Guid from "@helper/Guid";
 import ConsumptionFrequency from "./ConsumptionFrequency";
 import ConsumptionRoute from "./ConsumptionRoute";
 
-export default class MedicationConsumption {
+export default class MedicamentConsumption {
     constructor(
-        public readonly medicationId: Guid,
+        public readonly medicamentId: Guid,
         public readonly strength: number,
         public readonly amount: number,
         public readonly route: ConsumptionRoute,

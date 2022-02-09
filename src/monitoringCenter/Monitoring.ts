@@ -29,13 +29,13 @@ export default class Monitoring extends AggregateRoot {
                 this.applyChange(new AddedMonitoredValue(new Guid("mm1"), this._lastValue))
             this.applyChange(new AddedMonitoredValue(new Guid("mm1"), value))
             this._lastValue = value;
-
             return
         }
 
         if (
             (value.isNormal() && data.timestamp - this._lastTimestamp >= 60000) ||
-            (value.isWarning() && data.timestamp - this._lastTimestamp >= 10000)
+            (value.isWarning() && data.timestamp - this._lastTimestamp >= 10000) ||
+            (value.isCritical() && data.timestamp - this._lastTimestamp >= 5000)
         )
             this.applyChange(new AddedMonitoredValue(new Guid("mm1"), value))
         this._lastValue = value;

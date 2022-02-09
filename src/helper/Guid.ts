@@ -3,6 +3,9 @@ import { randomBytes } from "crypto";
 export default class Guid {
     constructor(private readonly value: string) { }
 
+    equals(obj: Guid): boolean {
+        return this.value === obj.value;
+    }
     toString() {
         return this.value;
     }

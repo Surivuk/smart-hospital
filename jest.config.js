@@ -13,6 +13,7 @@ module.exports = {
   },
   moduleNameMapper: {
     "^@app/(.*)$": "<rootDir>/src/$1",
+    "^@medication/(.*)$": "<rootDir>/src/medication/$1",
     "^@helper/(.*)$": "<rootDir>/src/helper/$1",
   },
   collectCoverage: true,
