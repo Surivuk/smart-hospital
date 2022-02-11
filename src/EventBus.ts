@@ -1,13 +1,18 @@
 export interface DomainEvent { }
 
-interface Handler<T extends DomainEvent> {
+export interface EventHandler<T extends DomainEvent> {
     (message: T): Promise<void>
 }
 
-export default class EventBus {
-    private readonly _handlers = new Map<string, Handler<any>[]>();
+export default interface EventBus {
+    on<T extends DomainEvent>(eventName: string, eventHandler: EventHandler<T>): this;
+    emit(event: DomainEvent): void;
+}
 
-    on<T extends DomainEvent>(eventName: string, eventHandler: Handler<T>): this {
+export class TestEventBus implements EventBus {
+    private readonly _handlers = new Map<string, EventHandler<any>[]>();
+
+    on<T extends DomainEvent>(eventName: string, eventHandler: EventHandler<T>): this {
         const handlers = this._handlers.get(eventName);
         if (handlers === undefined)
             this._handlers.set(eventName, [eventHandler]);

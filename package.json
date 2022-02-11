@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/Surivuk/smart-hospital#readme",
   "devDependencies": {
+    "@types/amqplib": "^0.8.2",
     "@types/jest": "^27.0.2",
     "@types/node": "^16.11.6",
     "jest": "^27.3.1",
@@ -29,6 +30,7 @@
   },
   "dependencies": {
     "@eventstore/db-client": "^2.1.1",
+    "amqplib": "^0.8.0",
     "redis": "^4.0.0"
   }
 }

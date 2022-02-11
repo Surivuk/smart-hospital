@@ -14,7 +14,9 @@ module.exports = {
   moduleNameMapper: {
     "^@app/(.*)$": "<rootDir>/src/$1",
     "^@medication/(.*)$": "<rootDir>/src/medication/$1",
+    "^@monitoring/(.*)$": "<rootDir>/src/monitoring/$1",
     "^@helper/(.*)$": "<rootDir>/src/helper/$1",
+    "^@events/(.*)$": "<rootDir>/src/events/$1",
   },
   collectCoverage: true,
   globals: {

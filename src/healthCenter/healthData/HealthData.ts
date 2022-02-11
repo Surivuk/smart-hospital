@@ -1,4 +1,4 @@
-export default interface MonitoredValue {
+export default interface HealthData {
     type(): string;
     isValid(): boolean;
     isNormal(): boolean;

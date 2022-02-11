@@ -1,5 +1,5 @@
-import Monitoring, { ReadData } from "@app/monitoringCenter/Monitoring";
-import { AddedMonitoredValue } from "@app/monitoringCenter/MonitoringEvents";
+import Monitoring, { ReadData } from "@app/healthCenter/Monitoring";
+import { AddedMonitoredValue } from "@app/healthCenter/MonitoringEvents";
 
 function timestamp(plusSecond?: number): number {
     const date = new Date();

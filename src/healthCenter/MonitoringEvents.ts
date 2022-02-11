@@ -1,8 +1,8 @@
 import EventStoreEvent from '@helper/EventStoreEvent';
 import Guid from '@helper/Guid';
 
-import MonitoredValue from './MonitoredValue';
+import HealthData from './healthData/HealthData';
 
 export class AddedMonitoredValue implements EventStoreEvent {
-    constructor(public readonly treatmentId: Guid, public readonly value: MonitoredValue) { }
+    constructor(public readonly treatmentId: Guid, public readonly value: HealthData) { }
 }

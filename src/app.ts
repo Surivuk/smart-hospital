@@ -8,12 +8,17 @@ import { HospitalTreatmentEventStore } from "./medication/hospitalTreatment/pers
 import ConsumptionFrequency from "./medication/medicamentConsumtion/ConsumptionFrequency";
 import ConsumptionRoute from "./medication/medicamentConsumtion/ConsumptionRoute";
 import MedicamentConsumption from "./medication/medicamentConsumtion/MedicamentConsumption";
-import HospitalTreatmentsReadService from "./services/HospitalTreatmentsReadService";
+import HospitalTreatmentsReadService from "./medication/hospitalTreatment/HospitalTreatmentsReadService";
 import ESTherapyRepository from "./medication/therapy/persistance/ESTherapyRepository";
 import { TherapyEventStore } from "./medication/therapy/persistance/TherapyEventStore";
 import { AddMedicationToTherapy, CreateTherapy } from "./medication/therapy/TherapyCommands";
 import TherapyProcessors from "./medication/therapy/TherapyProcessors";
 import { createClient } from "redis"
+import { channel, connect } from "@helper/rabbitMq/rabbitMq";
+import RabbitMqEventBus from "@helper/rabbitMq/RabbitMqEventBus";
+import DomainEventAdapter from "@helper/rabbitMq/DomainEventAdapter";
+import { HealthDataReceived } from "@events/MonitoringEvents";
+
 
 const client = EventStoreDBClient.connectionString("esdb://127.0.0.1:2113?tls=false")
 
@@ -22,26 +27,50 @@ const client = EventStoreDBClient.connectionString("esdb://127.0.0.1:2113?tls=fa
 const MEDICAL_CARD = new Guid("0a710cab-576b-4263-bf70-40e2ff203489");
 const DOCTOR = new Guid("3c3c4f8f-4cd0-4dc6-876c-9846643df8e9");
 
-const eventBus = new EventBus()
+// const eventBus = new EventBus()
 
 const repo = new ESTherapyRepository(client, new TherapyEventStore())
 const treatmentRepo = new ESHospitalTreatmentRepository(client, new HospitalTreatmentEventStore())
-const processors = new TherapyProcessors(repo, eventBus);
+// const processors = new TherapyProcessors(repo, eventBus);
 // const treatmentProcessors = new HospitalTreatmentProcessors(treatmentRepo)
 // const treatmentHandlers = new HospitalTreatmentEventHandlers(treatmentRepo)
 
 // treatmentHandlers.register(eventBus)
 
 const chain = new CommandChain();
-processors.register(chain)
+// processors.register(chain)
 // treatmentProcessors.register(chain)
 
 const redisClient = createClient();
 redisClient.on('error', (err) => console.log('Redis Client Error', err));
 
 async function main() {
-    await redisClient.connect();
-    new HospitalTreatmentsReadService().read(client, redisClient)
+
+    const connection = await connect("amqp://localhost")
+    const aChannel = await channel(connection)
+
+    const bus = new RabbitMqEventBus(aChannel, new DomainEventAdapter())
+    await bus.start()
+
+    bus.on(HealthDataReceived.name, async (event) => {
+        console.log(event)
+    })
+
+    let counter = 10
+    let int = setInterval(() => {
+        bus.emit(new HealthDataReceived(new Guid("treatment-123"), { type: "saturation", value: "99", timestamp: new Date().getTime() }))
+        if (counter === 0) {
+            clearInterval(int)
+            return;
+        } counter--
+    }, 1000)
+
+
+    console.log("DONE")
+
+
+    // await redisClient.connect();
+    // new HospitalTreatmentsReadService().read(client, redisClient)
 
 
     // await chain.process(new CreateHospitalTreatment(MEDICAL_CARD, DOCTOR))

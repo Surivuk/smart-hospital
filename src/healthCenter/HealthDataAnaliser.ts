@@ -1,10 +1,10 @@
 import { AggregateRoot } from "@helper/AggregateRoot";
 import EventStoreEvent from "@helper/EventStoreEvent";
 import Guid from "@helper/Guid";
-import MonitoredValue from "./MonitoredValue";
+import HealthData from "./healthData/HealthData";
 import { AddedMonitoredValue } from "./MonitoringEvents";
 import Timestamp from "./Timestamp";
-import Saturation from "./values/Saturation";
+import Saturation from "./healthData/Saturation";
 
 export type ReadData = {
     timestamp: number;
@@ -14,13 +14,13 @@ export type ReadData = {
 
 export class MonitoringSet {
 
-    constructor(private readonly _timestamp: Timestamp, private readonly _values: MonitoredValue[]) { }
+    constructor(private readonly _timestamp: Timestamp, private readonly _values: HealthData[]) { }
 }
 
-export default class Monitoring extends AggregateRoot {
+export default class HealthCenter extends AggregateRoot {
 
     private _lastTimestamp: number = 0;
-    private _lastValue: MonitoredValue | undefined;
+    private _lastValue: HealthData | undefined;
 
     processData(data: ReadData): void {
         const value = new Saturation(data.timestamp, parseInt(data.values[0].value));
@@ -41,7 +41,7 @@ export default class Monitoring extends AggregateRoot {
         this._lastValue = value;
     }
 
-    private hasSameStatus(v1: MonitoredValue, v2: MonitoredValue): boolean {
+    private hasSameStatus(v1: HealthData, v2: HealthData): boolean {
         return v1.isNormal() === v2.isNormal() &&
             v1.isWarning() === v2.isWarning() &&
             v1.isCritical() === v2.isCritical();

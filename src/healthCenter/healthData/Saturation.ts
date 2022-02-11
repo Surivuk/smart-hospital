@@ -1,6 +1,6 @@
-import MonitoredValue from "../MonitoredValue";
+import HealthData from "./HealthData";
 
-export default class Saturation implements MonitoredValue {
+export default class Saturation implements HealthData {
 
     constructor(private readonly _timestamp: number, private readonly _value: number) { }
 
