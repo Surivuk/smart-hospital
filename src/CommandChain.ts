@@ -1,10 +1,15 @@
 export interface ChainCommand { }
 
-interface Processor<T extends ChainCommand> {
+export interface Processor<T extends ChainCommand> {
     (message: T): Promise<void>
 }
+export default interface CommandChain {
+    registerProcessor<T extends ChainCommand>(commandName: string, processor: Processor<T>): this
+    process(command: ChainCommand): Promise<void>
+}
 
-export default class CommandChain {
+
+export class TestCommandChain implements CommandChain {
     private readonly _processors = new Map<string, Processor<any>>();
 
     registerProcessor<T extends ChainCommand>(commandName: string, processor: Processor<T>): this {

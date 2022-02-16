@@ -1,13 +1,13 @@
 import EventBus, { DomainEvent, EventHandler } from "@app/EventBus";
 import amqp from 'amqplib/callback_api';
-import DomainEventAdapter from "./DomainEventAdapter";
+import DomainEventAdapters from "./DomainEventAdapters";
 import { queue } from "./rabbitMq";
 
 export default class RabbitMqEventBus implements EventBus {
 
     private _queue!: amqp.Replies.AssertQueue
 
-    constructor(private readonly _channel: amqp.Channel, private readonly _adapter: DomainEventAdapter) { }
+    constructor(private readonly _channel: amqp.Channel, private readonly _adapter: DomainEventAdapters) { }
 
     async start() {
         this._queue = await queue(this._channel)

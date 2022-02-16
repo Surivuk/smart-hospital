@@ -1,13 +1,13 @@
 import { EventStoreDBClient } from "@eventstore/db-client";
 import Guid, { GuidFactory } from "@helper/Guid";
-import CommandChain from "./CommandChain";
+import CommandChain, { TestCommandChain } from "./CommandChain";
 import EventBus from "./EventBus";
 
 import ESHospitalTreatmentRepository from "./medication/hospitalTreatment/persistance/ESHospitalTreatmentRepository";
 import { HospitalTreatmentEventStore } from "./medication/hospitalTreatment/persistance/HospitalTreatmentEventStore";
-import ConsumptionFrequency from "./medication/medicamentConsumtion/ConsumptionFrequency";
-import ConsumptionRoute from "./medication/medicamentConsumtion/ConsumptionRoute";
-import MedicamentConsumption from "./medication/medicamentConsumtion/MedicamentConsumption";
+import ConsumptionFrequency from "./medication/medicamentConsumption/ConsumptionFrequency";
+import ConsumptionRoute from "./medication/medicamentConsumption/ConsumptionRoute";
+import MedicamentConsumption from "./medication/medicamentConsumption/MedicamentConsumption";
 import HospitalTreatmentsReadService from "./medication/hospitalTreatment/HospitalTreatmentsReadService";
 import ESTherapyRepository from "./medication/therapy/persistance/ESTherapyRepository";
 import { TherapyEventStore } from "./medication/therapy/persistance/TherapyEventStore";
@@ -16,8 +16,13 @@ import TherapyProcessors from "./medication/therapy/TherapyProcessors";
 import { createClient } from "redis"
 import { channel, connect } from "@helper/rabbitMq/rabbitMq";
 import RabbitMqEventBus from "@helper/rabbitMq/RabbitMqEventBus";
-import DomainEventAdapter from "@helper/rabbitMq/DomainEventAdapter";
 import { HealthDataReceived } from "@events/MonitoringEvents";
+import DomainEventAdapters from "@helper/rabbitMq/DomainEventAdapters";
+import RabbitMqCommandChain from "@helper/rabbitMq/RabbitMqCommandChain";
+import CommandAdapter from "@helper/rabbitMq/CommandAdapter";
+import AddExample from "./commands/Commands";
+import NormalStringField from "@helper/fields/NormalStringField";
+import NotEmptyStringField from "@helper/fields/NotEmptyStringField";
 
 
 const client = EventStoreDBClient.connectionString("esdb://127.0.0.1:2113?tls=false")
@@ -37,7 +42,7 @@ const treatmentRepo = new ESHospitalTreatmentRepository(client, new HospitalTrea
 
 // treatmentHandlers.register(eventBus)
 
-const chain = new CommandChain();
+const chain = new TestCommandChain();
 // processors.register(chain)
 // treatmentProcessors.register(chain)
 
@@ -47,26 +52,51 @@ redisClient.on('error', (err) => console.log('Redis Client Error', err));
 async function main() {
 
     const connection = await connect("amqp://localhost")
-    const aChannel = await channel(connection)
+    const serverChannel = await channel(connection)
+    const clientChannel = await channel(connection)
 
-    const bus = new RabbitMqEventBus(aChannel, new DomainEventAdapter())
-    await bus.start()
+    // const bus = new RabbitMqEventBus(aChannel, new DomainEventAdapters())
+    // await bus.start()
 
-    bus.on(HealthDataReceived.name, async (event) => {
-        console.log(event)
+    // bus.on(HealthDataReceived.name, async (event) => {
+    //     console.log(event)
+    // })
+
+    // let counter = 0
+    // let int = setInterval(() => {
+    //     bus.emit(new HealthDataReceived(new Guid("treatment-123"), { type: "saturation", value: "99", timestamp: new Date().getTime() }))
+    //     if (counter === 0) {
+    //         clearInterval(int)
+    //         return;
+    //     } counter--
+    // }, 1000)
+
+
+    const chain = new RabbitMqCommandChain(serverChannel, clientChannel, new CommandAdapter())
+    await chain.start()
+
+    console.log("Started...")
+
+    chain.registerProcessor<AddExample>("AddExample", async (command) => {
+        return new Promise<void>((resolve) => {
+            setTimeout(() => {
+                console.log("TICK")
+                resolve()
+            }, 1000 * 3)
+        })
+        // console.log("WORKED")
+        // throw new Error("FAKE")
     })
 
-    let counter = 10
-    let int = setInterval(() => {
-        bus.emit(new HealthDataReceived(new Guid("treatment-123"), { type: "saturation", value: "99", timestamp: new Date().getTime() }))
-        if (counter === 0) {
-            clearInterval(int)
-            return;
-        } counter--
-    }, 1000)
+    try {
+        await chain.process(new AddExample(new Guid("1"), NotEmptyStringField.create("Example name")))
+        console.log("Success", "DONE")
+    } catch (error) {
+        console.log("Error", error.message)
+    }
 
 
-    console.log("DONE")
+
 
 
     // await redisClient.connect();

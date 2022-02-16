@@ -1,4 +1,4 @@
-import CommandChain from "@app/CommandChain";
+import TestCommandChain from "@app/CommandChain";
 import EventBus from "@app/EventBus";
 import { TherapyCreated } from "@events/DomainEvents";
 import { GuidFactory } from "@helper/Guid";
@@ -9,7 +9,7 @@ import TherapyRepository from "./TherapyRepository";
 export default class TherapyProcessors {
     constructor(private readonly _repository: TherapyRepository, private readonly _eventBus: EventBus) { }
 
-    register(chain: CommandChain): CommandChain {
+    register(chain: TestCommandChain): TestCommandChain {
         return chain
             .registerProcessor<CreateTherapy>(CreateTherapy.name, async (command) => {
                 const therapy = Therapy.create(GuidFactory.guid(), command.therapyID)

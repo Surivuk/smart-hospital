@@ -1,4 +1,4 @@
-import MedicamentConsumption from "@medication/medicamentConsumtion/MedicamentConsumption";
+import MedicamentConsumption from "@medication/medicamentConsumption/MedicamentConsumption";
 import EventStoreEvent from "@helper/EventStoreEvent";
 import Guid from "@helper/Guid";
 

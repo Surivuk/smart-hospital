@@ -24,7 +24,7 @@ export async function channel(connection: amqp.Connection): Promise<amqp.Channel
 }
 export async function queue(channel: amqp.Channel, queue?: string): Promise<amqp.Replies.AssertQueue> {
     return new Promise((resolve, reject) => {
-        channel.assertQueue('', { exclusive: true }, function (error, q) {
+        channel.assertQueue(queue === undefined ? '' : queue, { exclusive: true }, function (error, q) {
             if (error) {
                 reject(error);
                 return;

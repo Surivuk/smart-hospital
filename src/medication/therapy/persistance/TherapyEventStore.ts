@@ -1,6 +1,6 @@
-import ConsumptionFrequency from '@medication/medicamentConsumtion/ConsumptionFrequency';
-import ConsumptionRoute from '@medication/medicamentConsumtion/ConsumptionRoute';
-import MedicamentConsumption from '@medication/medicamentConsumtion/MedicamentConsumption';
+import ConsumptionFrequency from '@medication/medicamentConsumption/ConsumptionFrequency';
+import ConsumptionRoute from '@medication/medicamentConsumption/ConsumptionRoute';
+import MedicamentConsumption from '@medication/medicamentConsumption/MedicamentConsumption';
 import { EventData, jsonEvent, JSONEventType } from '@eventstore/db-client';
 import EventStoreEvent from '@helper/EventStoreEvent';
 import Guid from '@helper/Guid';

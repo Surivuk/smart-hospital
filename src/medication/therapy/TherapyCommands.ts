@@ -1,5 +1,5 @@
 import { ChainCommand } from "@app/CommandChain";
-import MedicamentConsumption from "@medication/medicamentConsumtion/MedicamentConsumption";
+import MedicamentConsumption from "@medication/medicamentConsumption/MedicamentConsumption";
 import Guid from "@helper/Guid";
 
 export class CreateTherapy implements ChainCommand {
