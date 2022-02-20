@@ -1,14 +1,17 @@
 import HealthData from "./HealthData";
 
-export default class Saturation implements HealthData {
+export default class Saturation extends HealthData {
 
-    constructor(private readonly _timestamp: number, private readonly _value: number) { }
+    constructor(private readonly _timestamp: number, private readonly _value: number) { super() }
 
     type(): string {
         return "saturation";
     }
-    isValid(): boolean {
-        return this._value < 100 && this._value > 0;
+    value(): string {
+        return `${this._value}`;
+    }
+    timestamp(): number {
+        return this._timestamp;
     }
     isNormal(): boolean {
         return this._value >= 95;
@@ -18,11 +21,5 @@ export default class Saturation implements HealthData {
     }
     isCritical(): boolean {
         return this._value < 90;
-    }
-    toString(): string {
-        return `${this._value}`;
-    }
-    timestamp(): number {
-        return this._timestamp;
     }
 }

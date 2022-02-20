@@ -28,13 +28,13 @@ describe('When monitoring processed recorded values which are in normal range', 
     test('should be saturation record with 96 value', () => {
         const e = event(monitoring, 0);
         expect(e.type()).toBe("saturation")
-        expect(e.toString()).toBe("96")
+        expect(e.value()).toBe("96")
         expect(e.isNormal()).toBe(true)
     });
     test('should be saturation record with 97 value', () => {
         const e = event(monitoring, 1);
         expect(e.type()).toBe("saturation")
-        expect(e.toString()).toBe("98")
+        expect(e.value()).toBe("98")
         expect(e.isNormal()).toBe(true)
     });
 });
@@ -57,13 +57,13 @@ describe('When monitoring processed recorded values which are in warning range',
     test('should be saturation record with 91 value', () => {
         const e = event(monitoring, 0);
         expect(e.type()).toBe("saturation")
-        expect(e.toString()).toBe("91")
+        expect(e.value()).toBe("91")
         expect(e.isWarning()).toBe(true)
     });
     test('should be saturation record with 93 value', () => {
         const e = event(monitoring, 1);
         expect(e.type()).toBe("saturation")
-        expect(e.toString()).toBe("93")
+        expect(e.value()).toBe("93")
         expect(e.isWarning()).toBe(true)
     });
 });
@@ -86,13 +86,13 @@ describe('When monitoring processed recorded values which are in critical range'
     test('should be saturation record with 80 value', () => {
         const e = event(monitoring, 0);
         expect(e.type()).toBe("saturation")
-        expect(e.toString()).toBe("80")
+        expect(e.value()).toBe("80")
         expect(e.isCritical()).toBe(true)
     });
     test('should be saturation record with 82 value', () => {
         const e = event(monitoring, 1);
         expect(e.type()).toBe("saturation")
-        expect(e.toString()).toBe("82")
+        expect(e.value()).toBe("82")
         expect(e.isCritical()).toBe(true)
     });
 });
@@ -121,7 +121,7 @@ describe('When monitoring processed recorded values which are changes from norma
         const expectedStatuses = ["normal", "warning", "warning", "warning", "normal", "normal"];
         (monitoring.uncommittedChanges() as AddedMonitoredValue[]).forEach(({ value: e }, index) => {
             expect(e.type()).toBe("saturation")
-            expect(e.toString()).toBe(expectedValues[index])
+            expect(e.value()).toBe(expectedValues[index])
             expect(e.isNormal()).toBe(expectedStatuses[index] === "normal")
             expect(e.isWarning()).toBe(expectedStatuses[index] === "warning")
         })

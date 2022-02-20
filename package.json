@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "ts-node-dev -r tsconfig-paths/register src/app.ts",
-    "test": "jest"
+    "test": "jest",
+    "silent-test": "jest --silent --coverage=false"
   },
   "repository": {
     "type": "git",
