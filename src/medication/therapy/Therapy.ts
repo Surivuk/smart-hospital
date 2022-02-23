@@ -1,7 +1,7 @@
 import MedicamentConsumption from '@medication/medicamentConsumption/MedicamentConsumption';
-import { AggregateRoot } from '@helper/AggregateRoot';
-import EventStoreEvent from '@helper/EventStoreEvent';
-import Guid from '@helper/Guid';
+import { AggregateRoot } from '@common/AggregateRoot';
+import EventStoreEvent from '@common/EventStoreEvent';
+import Guid from '@common/Guid';
 
 import { MedicationAddedToTherapy, MedicationRemovedFromTherapy, TherapyCreated } from './TherapyEvents';
 

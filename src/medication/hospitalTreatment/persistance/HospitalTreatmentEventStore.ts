@@ -1,6 +1,6 @@
 import { EventData, jsonEvent, JSONEventType } from '@eventstore/db-client';
-import EventStoreEvent from '@helper/EventStoreEvent';
-import Guid from '@helper/Guid';
+import EventStoreEvent from '@common/EventStoreEvent';
+import Guid from '@common/Guid';
 
 import { HospitalTreatmentCreated, TherapyAddedToHospitalTreatment } from '../HospitalTreatmentEvents';
 

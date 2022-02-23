@@ -1,5 +1,5 @@
-import EventStoreEvent from "@helper/EventStoreEvent";
-import Guid from "@helper/Guid";
+import EventStoreEvent from "@common/EventStoreEvent";
+import Guid from "@common/Guid";
 
 export class MedicalCardCreated implements EventStoreEvent {
     constructor(public readonly medicalCardId: Guid, public readonly patientId: Guid) { }

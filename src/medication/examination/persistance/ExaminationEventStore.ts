@@ -1,8 +1,8 @@
 import { EventData, jsonEvent, JSONEventType } from '@eventstore/db-client';
-import EventStoreEvent from '@helper/EventStoreEvent';
-import NormalStringField from '@helper/fields/NormalStringField';
-import NotEmptyStringField from '@helper/fields/NotEmptyStringField';
-import Guid from '@helper/Guid';
+import EventStoreEvent from '@common/EventStoreEvent';
+import NormalStringField from '@common/fields/NormalStringField';
+import NotEmptyStringField from '@common/fields/NotEmptyStringField';
+import Guid from '@common/Guid';
 import { ExaminationCreated, NoteAddedToExamination } from '../ExaminationEvents';
 
 

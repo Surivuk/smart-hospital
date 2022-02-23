@@ -1,4 +1,4 @@
-import Guid from "@helper/Guid";
+import Guid from "@common/Guid";
 import Therapy from "./Therapy";
 
 export default interface TherapyRepository {

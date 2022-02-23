@@ -1,4 +1,4 @@
-import Guid from "@helper/Guid";
+import Guid from "@common/Guid";
 import ConsumptionFrequency from "./ConsumptionFrequency";
 import ConsumptionRoute from "./ConsumptionRoute";
 

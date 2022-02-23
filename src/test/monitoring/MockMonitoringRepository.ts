@@ -1,4 +1,4 @@
-import Guid from "@helper/Guid";
+import Guid from "@common/Guid";
 import Monitoring from "@monitoring/Monitoring";
 import MonitoringRepository from "@monitoring/MonitoringRepository";
 

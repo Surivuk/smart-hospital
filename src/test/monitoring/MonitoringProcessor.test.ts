@@ -1,6 +1,6 @@
 import EventBus, { TestEventBus } from "@app/EventBus";
 import { HealthDataReceived } from "@events/MonitoringEvents";
-import Guid from "@helper/Guid";
+import Guid from "@common/Guid";
 import Monitoring from "@monitoring/Monitoring";
 import MonitoringCommandProcessor from "@monitoring/MonitoringCommandProcessor";
 import MockMonitoringRepository from "./MockMonitoringRepository";

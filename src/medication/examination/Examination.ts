@@ -1,7 +1,7 @@
-import { AggregateRoot } from "@helper/AggregateRoot"
-import EventStoreEvent from "@helper/EventStoreEvent"
-import StringField from "@helper/fields/StringField"
-import Guid from "@helper/Guid"
+import { AggregateRoot } from "@common/AggregateRoot"
+import EventStoreEvent from "@common/EventStoreEvent"
+import StringField from "@common/fields/StringField"
+import Guid from "@common/Guid"
 import { ExaminationCreated, NoteAddedToExamination } from "./ExaminationEvents"
 
 export class ExaminationError extends Error {

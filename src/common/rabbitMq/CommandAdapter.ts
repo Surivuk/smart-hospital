@@ -1,8 +1,12 @@
 import { ChainCommand } from "@app/CommandChain";
 import AddExample from "@app/commands/Commands";
 import { HealthDataReceived } from "@events/MonitoringEvents";
-import NotEmptyStringField from "@helper/fields/NotEmptyStringField";
-import Guid from "@helper/Guid";
+import NotEmptyStringField from "@common/fields/NotEmptyStringField";
+import Guid from "@common/Guid";
+import AddPatient from "@app/commands/AdministrationCommands";
+import Name from "@adminstration/Name";
+import Gender from "@adminstration/Gender";
+import NormalNumberField from "@common/fields/NormalNumberField";
 
 interface CommandSerializer<T extends ChainCommand> {
     (event: T): any
@@ -20,13 +24,16 @@ export class CommandAdapterError extends Error {
 export default class CommandAdapter {
 
     private readonly _serializer: { [key: string]: CommandSerializer<any> } = {
-        [AddExample.name]: ({ id, name }: AddExample) => ({
-            id: id.toString(),
-            name: name.toString(),
+        [AddPatient.name]: ({ name, gender, birthYear }: AddPatient) => ({
+            firstName: name.firstName,
+            lastName: name.lastName,
+            gender: gender.toString(),
+            birthYear: birthYear.value()
         })
     }
     private readonly _deserializer: { [key: string]: CommandDeserializer<any> } = {
-        [AddExample.name]: ({ id, name }) => new AddExample(new Guid(id), NotEmptyStringField.create(name))
+        [AddPatient.name]: ({ firstName, lastName, gender, birthYear }) =>
+            new AddPatient(Name.create(firstName, lastName), Gender.create(gender), NormalNumberField.create(birthYear))
     }
 
 

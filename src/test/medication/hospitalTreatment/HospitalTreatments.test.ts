@@ -1,5 +1,5 @@
-import { aggregateRootTestFixture, TestFixtureResult } from "@helper/AggregateRootTestFixture";
-import Guid from "@helper/Guid";
+import { aggregateRootTestFixture, TestFixtureResult } from "@common/AggregateRootTestFixture";
+import Guid from "@common/Guid";
 import HospitalTreatment, { HospitalTreatmentError } from "@medication/hospitalTreatment/HospitalTreatment";
 import { HospitalTreatmentCreated, TherapyAddedToHospitalTreatment, TherapyRemovedFromHospitalTreatment } from "@medication/hospitalTreatment/HospitalTreatmentEvents";
 

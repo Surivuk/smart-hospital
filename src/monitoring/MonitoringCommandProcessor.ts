@@ -1,6 +1,6 @@
 import EventBus from "@app/EventBus";
 import { HealthDataReceived } from "@events/MonitoringEvents";
-import Guid from "@helper/Guid";
+import Guid from "@common/Guid";
 import { HealthData } from "./HealthData";
 import MonitoringRepository from "./MonitoringRepository";
 

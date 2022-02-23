@@ -1,4 +1,4 @@
-import Guid from "@helper/Guid";
+import Guid from "@common/Guid";
 import HospitalTreatment from "./HospitalTreatment";
 
 export default interface HospitalTreatmentRepository {

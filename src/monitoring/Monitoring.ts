@@ -1,4 +1,4 @@
-import Guid from "@helper/Guid";
+import Guid from "@common/Guid";
 import { HealthData } from "./HealthData";
 import HealthDataMonitor from "./monitors/HealthDataMonitor";
 

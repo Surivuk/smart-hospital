@@ -1,7 +1,7 @@
 import TestCommandChain from "@app/CommandChain";
 import EventBus from "@app/EventBus";
 import { TherapyCreated } from "@events/DomainEvents";
-import { GuidFactory } from "@helper/Guid";
+import { GuidFactory } from "@common/Guid";
 import Therapy from "./Therapy";
 import { AddMedicationToTherapy, CreateTherapy, RemoveMedicationFromTherapy } from "./TherapyCommands";
 import TherapyRepository from "./TherapyRepository";

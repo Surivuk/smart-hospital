@@ -1,6 +1,6 @@
 import Monitoring from "@monitoring/Monitoring";
 import { HealthData } from "@monitoring/HealthData";
-import Guid from "@helper/Guid";
+import Guid from "@common/Guid";
 import { testData, TestMonitor } from "./TestMonitor";
 
 function processData(data: HealthData) {

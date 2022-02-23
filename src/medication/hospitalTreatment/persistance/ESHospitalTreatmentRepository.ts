@@ -1,7 +1,7 @@
 
 import { EventData, EventStoreDBClient, FORWARDS, START } from "@eventstore/db-client";
-import EventStoreEvent from "@helper/EventStoreEvent";
-import Guid from "@helper/Guid";
+import EventStoreEvent from "@common/EventStoreEvent";
+import Guid from "@common/Guid";
 import HospitalTreatment from "../HospitalTreatment";
 import HospitalTreatmentRepository from "../HospitalTreatmentRepository";
 import { HospitalTreatmentEvents, HospitalTreatmentEventStore } from "./HospitalTreatmentEventStore";

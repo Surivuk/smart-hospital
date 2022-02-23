@@ -2,7 +2,7 @@ import CommandChain, { ChainCommand, Processor } from "@app/CommandChain";
 import amqp from 'amqplib/callback_api';
 import CommandAdapter from "./CommandAdapter";
 import { queue } from "./rabbitMq";
-import { GuidFactory } from "@helper/Guid";
+import { GuidFactory } from "@common/Guid";
 
 interface CommandAck {
     type: "success" | "error"

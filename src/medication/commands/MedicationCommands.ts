@@ -1,5 +1,5 @@
 import { ChainCommand } from "@app/CommandChain";
-import Guid from "@helper/Guid";
+import Guid from "@common/Guid";
 
 export class CreateHospitalTreatment implements ChainCommand {
     constructor(public readonly medicalCardId: Guid, public readonly doctorId: Guid) { }

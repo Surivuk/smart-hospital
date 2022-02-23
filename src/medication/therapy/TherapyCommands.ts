@@ -1,6 +1,6 @@
 import { ChainCommand } from "@app/CommandChain";
 import MedicamentConsumption from "@medication/medicamentConsumption/MedicamentConsumption";
-import Guid from "@helper/Guid";
+import Guid from "@common/Guid";
 
 export class CreateTherapy implements ChainCommand {
     constructor(public readonly therapyID: Guid, public readonly medications: MedicamentConsumption[]) { }

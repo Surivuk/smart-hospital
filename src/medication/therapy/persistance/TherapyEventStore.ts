@@ -2,8 +2,8 @@ import ConsumptionFrequency from '@medication/medicamentConsumption/ConsumptionF
 import ConsumptionRoute from '@medication/medicamentConsumption/ConsumptionRoute';
 import MedicamentConsumption from '@medication/medicamentConsumption/MedicamentConsumption';
 import { EventData, jsonEvent, JSONEventType } from '@eventstore/db-client';
-import EventStoreEvent from '@helper/EventStoreEvent';
-import Guid from '@helper/Guid';
+import EventStoreEvent from '@common/EventStoreEvent';
+import Guid from '@common/Guid';
 
 import { MedicationAddedToTherapy, MedicationRemovedFromTherapy, TherapyCreated } from '../TherapyEvents';
 

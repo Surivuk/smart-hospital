@@ -1,6 +1,6 @@
-import EventStoreEvent from "@helper/EventStoreEvent";
-import StringField from "@helper/fields/StringField";
-import Guid from "@helper/Guid";
+import EventStoreEvent from "@common/EventStoreEvent";
+import StringField from "@common/fields/StringField";
+import Guid from "@common/Guid";
 
 export class ExaminationCreated implements EventStoreEvent {
     constructor(public readonly examinationId: Guid, public readonly doctorId: Guid, public readonly diagnose: StringField) { }

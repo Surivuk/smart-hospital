@@ -1,4 +1,4 @@
-import Guid from "@helper/Guid";
+import Guid from "@common/Guid";
 import Monitoring from "./Monitoring";
 
 export default interface MonitoringRepository {
