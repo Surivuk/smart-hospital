@@ -1,7 +1,4 @@
-import AdminstrationProcessor from '@adminstration/AdminstrationProcessor';
-import PatientsController from '@app/api/http/routers/controllers/PatientsController';
 import DoctorQueryService from '@adminstration/doctor/DoctorQueryService';
-import PatientRepository from '@adminstration/patient/PatientRepository';
 import PatientQueryService from '@app/adminstration/patient/PatientQueryService';
 import CommandChain from '@app/CommandChain';
 import EventBus from '@app/EventBus';
@@ -16,8 +13,9 @@ export interface Dependency {
 }
 
 export default interface DependencyContainer {
-    dependency(): Promise<Dependency>
-    registerProcesses(): void;
-    registerEventHandlers(): void;
+    createDependency(): Promise<this>;
+    registerProcesses(): this;
+    registerHandlers(): this;
+    startHttpApi(): this;
 }
 
