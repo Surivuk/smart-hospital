@@ -22,7 +22,13 @@ export default class MedicalCard extends AggregateRoot {
         this.applyChange(new TherapyNotedToMedicalCard(this._id, therapyId))
     }
 
-    protected apply(event: EventStoreEvent): void { }
+    protected apply(event: EventStoreEvent): void { 
+        if(event instanceof MedicalCardCreated) this.applyMedicalCardCreated(event)
+    }
+
+    private applyMedicalCardCreated(event: MedicalCardCreated) {
+        this._id = event.medicalCardId;
+    }
 
     private createMedicalCard(id: Guid, patientId: Guid) {
         this.applyChange(new MedicalCardCreated(id, patientId))

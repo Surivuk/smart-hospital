@@ -9,9 +9,9 @@ interface EventStoreAdapter<E extends EventStoreEvent, D extends MedicalCardEven
     event(event: D["data"]): E
 }
 
-function eventData<T extends MedicalCardEvents["type"], D extends MedicalCardEvents["data"]>(type: T, data: D): EventData {
-    return jsonEvent<MedicalCardEvents>({ type, data })
-}
+// function eventData<T extends MedicalCardEvents["type"], D extends MedicalCardEvents["data"]>(type: T, data: D): EventData {
+//     return jsonEvent<MedicalCardEvents>({ type, data })
+// }
 
 export type MedicalCardCreatedEvent = JSONEventType<"medical-card-created", {
     medicalCardId: string;
@@ -37,48 +37,60 @@ export class MedicalCardEventStore {
         if (event instanceof TreatmentNotedToMedicalCard) return this.treatmentNotedToMedicalCard.eventData(event);
         if (event instanceof ExaminationNotedToMedicalCard) return this.examinationNotedToMedicalCard.eventData(event);
         if (event instanceof TherapyNotedToMedicalCard) return this.therapyNotedToMedicalCard.eventData(event);
-        throw new Error();
+        throw new Error(`[MedicalCardEventStore] - [eventData] - Not found event class`);
     }
     event(event: MedicalCardEvents): EventStoreEvent {
         if (event.type === "medical-card-created") return this.medicalCardCreated.event(event.data);
         if (event.type === "treatment-noted-to-medical-card") return this.treatmentNotedToMedicalCard.event(event.data)
         if (event.type === "examination-noted-to-medical-card") return this.examinationNotedToMedicalCard.event(event.data)
         if (event.type === "therapy-noted-to-medical-card") return this.therapyNotedToMedicalCard.event(event.data)
-        throw new Error();
+        throw new Error(`[MedicalCardEventStore] - [event] - Not found event type`);
     }
 
     private get medicalCardCreated(): EventStoreAdapter<MedicalCardCreated, MedicalCardCreatedEvent> {
         return {
-            eventData: (event) => eventData("medical-card-created", {
-                medicalCardId: event.medicalCardId.toString(),
-                patientId: event.patientId.toString()
+            eventData: (event) => jsonEvent<MedicalCardCreatedEvent>({
+                type: "medical-card-created",
+                data: {
+                    medicalCardId: event.medicalCardId.toString(),
+                    patientId: event.patientId.toString()
+                },
             }),
             event: (data) => new MedicalCardCreated(new Guid(data.medicalCardId), new Guid(data.patientId))
         }
     }
     private get treatmentNotedToMedicalCard(): EventStoreAdapter<TreatmentNotedToMedicalCard, TreatmentNotedToMedicalCardEvent> {
         return {
-            eventData: (event) => eventData("treatment-noted-to-medical-card", {
-                medicalCardId: event.medicalCardId.toString(),
-                treatmentId: event.treatmentId.toString()
+            eventData: (event) => jsonEvent<TreatmentNotedToMedicalCardEvent>({
+                type: "treatment-noted-to-medical-card",
+                data: {
+                    medicalCardId: event.medicalCardId.toString(),
+                    treatmentId: event.treatmentId.toString()
+                },
             }),
             event: (data) => new TreatmentNotedToMedicalCard(new Guid(data.medicalCardId), new Guid(data.treatmentId))
         }
     }
     private get examinationNotedToMedicalCard(): EventStoreAdapter<ExaminationNotedToMedicalCard, ExaminationNotedToMedicalCardEvent> {
         return {
-            eventData: (event) => eventData("examination-noted-to-medical-card", {
-                medicalCardId: event.medicalCardId.toString(),
-                examinationId: event.examinationId.toString()
+            eventData: (event) => jsonEvent({
+                type: "examination-noted-to-medical-card",
+                data: {
+                    medicalCardId: event.medicalCardId.toString(),
+                    examinationId: event.examinationId.toString()
+                }
             }),
             event: (data) => new ExaminationNotedToMedicalCard(new Guid(data.medicalCardId), new Guid(data.examinationId))
         }
     }
     private get therapyNotedToMedicalCard(): EventStoreAdapter<TherapyNotedToMedicalCard, TherapyNotedToMedicalCardEvent> {
         return {
-            eventData: (event) => eventData("therapy-noted-to-medical-card", {
-                medicalCardId: event.medicalCardId.toString(),
-                therapyId: event.therapyId.toString()
+            eventData: (event) => jsonEvent({
+                type: "therapy-noted-to-medical-card",
+                data: {
+                    medicalCardId: event.medicalCardId.toString(),
+                    therapyId: event.therapyId.toString()
+                }
             }),
             event: (data) => new TherapyNotedToMedicalCard(new Guid(data.medicalCardId), new Guid(data.therapyId))
         }

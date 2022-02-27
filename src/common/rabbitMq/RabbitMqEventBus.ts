@@ -17,13 +17,13 @@ export default class RabbitMqEventBus implements EventBus {
         const queue = this._queue.queue;
         this.assertExchange(eventName)
         this._channel.bindQueue(queue, eventName, '');
-        this._channel.consume(queue, (msg) => {
+        this._channel.consume(queue, async (msg) => {
             if (msg === null) return;
             if (msg.content) {
                 try {
-                    eventHandler(this._adapter.toEvent(eventName, JSON.parse(msg.content.toString())))
+                    await eventHandler(this._adapter.toEvent(eventName, JSON.parse(msg.content.toString())))
                 } catch (error) {
-                    throw error
+                    console.log(`[EVENT BUS] - ${error.message}`)
                 }
             }
         }, { noAck: true });
