@@ -7,6 +7,7 @@ import AddPatient from "@app/commands/AdministrationCommands";
 import Name from "@adminstration/Name";
 import Gender from "@adminstration/Gender";
 import NormalNumberField from "@common/fields/NormalNumberField";
+import CreateExamination from "@app/commands/MedicationCommands";
 
 interface CommandSerializer<T extends ChainCommand> {
     (event: T): any
@@ -24,16 +25,25 @@ export class CommandAdapterError extends Error {
 export default class CommandAdapter {
 
     private readonly _serializer: { [key: string]: CommandSerializer<any> } = {
-        [AddPatient.name]: ({ name, gender, birthYear }: AddPatient) => ({
+        [AddPatient.name]: ({ patientId, name, gender, birthYear }: AddPatient) => ({
+            patientId: patientId.toString(),
             firstName: name.firstName,
             lastName: name.lastName,
             gender: gender.toString(),
             birthYear: birthYear.value()
+        }),
+        [CreateExamination.name]: ({ medicalCardId, examinationId, doctorId, diagnose }: CreateExamination) => ({
+            medicalCardId: medicalCardId.toString(),
+            examinationId: examinationId.toString(),
+            doctorId: doctorId.toString(),
+            diagnose: diagnose.toString()
         })
     }
     private readonly _deserializer: { [key: string]: CommandDeserializer<any> } = {
-        [AddPatient.name]: ({ firstName, lastName, gender, birthYear }) =>
-            new AddPatient(Name.create(firstName, lastName), Gender.create(gender), NormalNumberField.create(birthYear))
+        [AddPatient.name]: ({ patientId, firstName, lastName, gender, birthYear }) =>
+            new AddPatient(new Guid(patientId), Name.create(firstName, lastName), Gender.create(gender), NormalNumberField.create(birthYear)),
+        [CreateExamination.name]: ({ medicalCardId, examinationId, doctorId, diagnose }) =>
+            new CreateExamination(new Guid(medicalCardId), new Guid(examinationId), new Guid(doctorId), NotEmptyStringField.create(diagnose))
     }
 
 

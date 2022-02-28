@@ -1,11 +1,14 @@
-import KnexConnector from "@common/db/KnexConnector";
-import EventStoreEvent from "@common/EventStoreEvent";
-import ReadWorker from "@common/ReadWorker";
-import { AllStreamRecordedEvent, EventStoreDBClient, eventTypeFilter, FORWARDS, persistentSubscriptionToAllSettingsFromDefaults, persistentSubscriptionToStreamSettingsFromDefaults, START } from "@eventstore/db-client";
-import MedicalCard from "../MedicalCard";
-import { MedicalCardCreatedEvent, MedicalCardEvents, MedicalCardEventStore, TreatmentNotedToMedicalCardEvent } from "./MedicalCardEventStore";
+import KnexConnector from '@common/db/KnexConnector';
+import EventStoreEvent from '@common/EventStoreEvent';
+import ReadWorker from '@common/ReadWorker';
+import { AllStreamRecordedEvent, EventStoreDBClient, eventTypeFilter, FORWARDS, persistentSubscriptionToAllSettingsFromDefaults, START } from '@eventstore/db-client';
+
+import MedicalCard from '../MedicalCard';
+import { MedicalCardEvents, MedicalCardEventStore } from './MedicalCardEventStore';
 
 export default class MedicalCardReadWorker extends KnexConnector implements ReadWorker {
+
+    private readonly _groupName: string = "medical-card";
 
     constructor(
         private readonly _client: EventStoreDBClient,
@@ -14,17 +17,24 @@ export default class MedicalCardReadWorker extends KnexConnector implements Read
 
     async work(): Promise<void> {
         try {
-            // await this._client.getPersistentSubscriptionToAllInfo("medical-card-stream-2");
-            // await this._client.replayParkedMessagesToAll("medical-card-stream")
-            // await this._client.deletePersistentSubscriptionToAll("medical-card")
-            // await this._client.createPersistentSubscriptionToAll(
-            //     "medical-card",
-            //     { ...persistentSubscriptionToAllSettingsFromDefaults(), startFrom: START },
-            //     {
-            //         filter: eventTypeFilter({ prefixes: ["medical-card-"], })
-            //     }
-            // )
-            const subscription = this._client.subscribeToPersistentSubscriptionToAll("medical-card")
+            try {
+                await this._client.getPersistentSubscriptionToAllInfo(this._groupName)
+            } catch (error) {
+                await this._client.createPersistentSubscriptionToAll(this._groupName,
+                    { ...persistentSubscriptionToAllSettingsFromDefaults(), startFrom: START },
+                    {
+                        filter: eventTypeFilter({
+                            prefixes: [
+                                "medical-card-created",
+                                "treatment-noted-to-medical-card",
+                                "examination-noted-to-medical-card",
+                                "therapy-noted-to-medical-card"
+                            ]
+                        })
+                    }
+                )
+            }
+            const subscription = this._client.subscribeToPersistentSubscriptionToAll(this._groupName)
 
             try {
                 for await (const event of subscription) {
@@ -43,7 +53,6 @@ export default class MedicalCardReadWorker extends KnexConnector implements Read
     private async handleEvent(event: AllStreamRecordedEvent) {
         try {
             const id = event.streamId.split("medical-card-")[1]
-            console.log(id)
             if (event.type === "medical-card-created") await this.createMedicalCard(id, event.data);
             if (event.type === "treatment-noted-to-medical-card") await this.noteTreatment(id, event.data);
             if (event.type === "examination-noted-to-medical-card") await this.noteExamination(id, event.data);

@@ -22,7 +22,13 @@ export default class Examination extends AggregateRoot {
         this.applyChange(new NoteAddedToExamination(this._id, doctorId, note))
     }
 
-    protected apply(event: EventStoreEvent): void { }
+    protected apply(event: EventStoreEvent): void {
+        if (event instanceof ExaminationCreated) this.applyExaminationCreated(event)
+    }
+
+    private applyExaminationCreated(event: ExaminationCreated) {
+        this._id = event.examinationId;
+    }
 
 
 } 

@@ -10,11 +10,14 @@ import RabbitMqCommandChain from '@common/rabbitMq/RabbitMqCommandChain';
 import RabbitMqEventBus from '@common/rabbitMq/RabbitMqEventBus';
 import ReadWorker from '@common/ReadWorker';
 import { EventStoreDBClient } from '@eventstore/db-client';
+import ESExaminationRepository from '@medication/examination/persistance/ESExaminationRepository';
+import { ExaminationEventStore } from '@medication/examination/persistance/ExaminationEventStore';
 import DBMedicalCardQueryService from '@medication/medicalCard/persistance/DBMedicalCardQueryService';
 import ESMedicalCardRepository from '@medication/medicalCard/persistance/ESMedicalCardRepository';
 import { MedicalCardEventStore } from '@medication/medicalCard/persistance/MedicalCardEventStore';
 import MedicalCardReadWorker from '@medication/medicalCard/persistance/MedicalCardReadWorker';
 import MedicationEventHandler from '@medication/MedicationEventHandlers';
+import MedicationProcessor from '@medication/MedicationProcessor';
 
 import DependencyContainer, { Dependency } from './DependencyContainer';
 
@@ -27,6 +30,7 @@ export default class AppDependencyContainer implements DependencyContainer {
 
     // Processors
     private _adminstrationProcessor!: AdminstrationProcessor
+    private _medicationProcessor!: MedicationProcessor
 
     // EventHandlers
     private _medicationEventHandler!: MedicationEventHandler
@@ -42,13 +46,15 @@ export default class AppDependencyContainer implements DependencyContainer {
 
         // Repositories
         const patientRepository = new MockPatientRepository()
-        const MedicalCardRepository = new ESMedicalCardRepository(client, new MedicalCardEventStore())
+        const medicalCardRepository = new ESMedicalCardRepository(client, new MedicalCardEventStore())
+        const examinationRepository = new ESExaminationRepository(client, new ExaminationEventStore())
 
         // Processors
         this._adminstrationProcessor = new AdminstrationProcessor(patientRepository, this._eventBus)
+        this._medicationProcessor = new MedicationProcessor(medicalCardRepository, examinationRepository, this._eventBus)
 
         // EventHandlers
-        this._medicationEventHandler = new MedicationEventHandler(MedicalCardRepository)
+        this._medicationEventHandler = new MedicationEventHandler(medicalCardRepository)
 
         // ReadWorkers
         this._readWorkers.push(new MedicalCardReadWorker(client, new MedicalCardEventStore()))
@@ -79,7 +85,8 @@ export default class AppDependencyContainer implements DependencyContainer {
 
     registerProcesses(): this {
         [
-            this._adminstrationProcessor
+            this._adminstrationProcessor,
+            this._medicationProcessor
         ].forEach(processor => processor.registerProcesses(this._commandChain))
         return this;
     }

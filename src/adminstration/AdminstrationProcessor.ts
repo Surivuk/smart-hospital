@@ -14,8 +14,7 @@ export default class AdminstrationProcessor {
 
     registerProcesses(commandChain: CommandChain) {
         commandChain
-            .registerProcessor<AddPatient>(AddPatient.name, async ({ name, gender, birthYear }) => {
-                const patientId = GuidFactory.guid()
+            .registerProcessor<AddPatient>(AddPatient.name, async ({ patientId, name, gender, birthYear }) => {
                 await await this._patientRepo.createPatient(patientId, name, gender, birthYear)
                 this._eventBus.emit(new PatientAdded(patientId))
             })

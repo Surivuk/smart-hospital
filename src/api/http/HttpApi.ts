@@ -3,6 +3,8 @@ import { Dependency } from "@app/dependency/DependencyContainer";
 import HttpServer from "@common/http/HttpServer";
 import { Application } from "express";
 import DoctorRouter from "./routers/doctors/DoctorRouter";
+import ExaminationsController from "./routers/examination/ExaminationsController";
+import ExaminationsRouter from "./routers/examination/ExaminationsRouter";
 import MedicalCardsController from "./routers/medicalCards/MedicalCardsController";
 import MedicalCardsRouter from "./routers/medicalCards/MedicalCardsRouter";
 import PatientsController from "./routers/patients/PatientsController";
@@ -22,5 +24,6 @@ export default class HttpApi extends HttpServer {
             ).router())
             .use("/doctors", new DoctorRouter(new DoctorsController(this._dependency.doctorQueryService)).router())
             .use("/medical-cards", new MedicalCardsRouter(new MedicalCardsController(this._dependency.medicalCardQueryService)).router())
+            .use("/examinations", new ExaminationsRouter(new ExaminationsController(this._dependency.commandChain)).router())
     }
 }

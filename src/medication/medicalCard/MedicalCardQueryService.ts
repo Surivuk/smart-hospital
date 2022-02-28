@@ -2,6 +2,7 @@ import Guid from "@common/Guid";
 
 export interface MedicalCardReadModel {
     id: string;
+    examinations: { examinationId: string, createdAt: string }[]
     createdAt: string;
 }
 

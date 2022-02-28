@@ -1,4 +1,3 @@
-import DoctorsController from '@app/api/http/routers/doctors/DoctorsController';
 import HttpRouter from '@common/http/HttpRouter';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
@@ -11,6 +10,7 @@ export default class MedicalCardsRouter implements HttpRouter {
     router(): Router {
         return Router()
             .get("/", asyncHandler((req, res) => this._controller.medicalCards(req, res)))
+            .get("/:id", asyncHandler((req, res) => this._controller.medicalCard(req, res)))
     }
 
 }
