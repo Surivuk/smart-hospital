@@ -33,6 +33,8 @@ export default class DBMedicalCardQueryService extends KnexConnector implements 
         return {
             id: row.id,
             examinations: myEvents.filter(e => e.type === "EXAMINATION").map(e => ({ examinationId: e.event_id, createdAt: e.created_at })),
+            therapies: myEvents.filter(e => e.type === "THERAPY").map(e => ({ therapyId: e.event_id, createdAt: e.created_at })),
+            hospitalTreatments: myEvents.filter(e => e.type === "TREATMENT").map(e => ({ treatmentId: e.event_id, createdAt: e.created_at })),
             createdAt: row.created_at
         }
     }

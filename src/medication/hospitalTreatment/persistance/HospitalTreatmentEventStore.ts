@@ -10,11 +10,7 @@ interface EventStoreAdapter<E extends EventStoreEvent, D extends HospitalTreatme
     event(event: D["data"]): E
 }
 
-function eventData<T extends HospitalTreatmentEvents["type"], D extends HospitalTreatmentEvents["data"]>(type: T, data: D): EventData {
-    return jsonEvent<HospitalTreatmentEvents>({ type, data })
-}
-
-export type HospitalTreatmentCreatedEvent = JSONEventType<"hospital-treatment-created", { treatmentId: string; medicalCardId: string; doctorId: string; }>;
+export type HospitalTreatmentCreatedEvent = JSONEventType<"hospital-treatment-created", { treatmentId: string; medicalCardId: string; }>;
 export type TherapyAddedToHospitalTreatmentEvent = JSONEventType<"therapy-added-to-treatment", {
     treatmentId: string;
     therapyId: string;
@@ -35,19 +31,23 @@ export class HospitalTreatmentEventStore {
 
     private get treatmentCreated(): EventStoreAdapter<HospitalTreatmentCreated, HospitalTreatmentCreatedEvent> {
         return {
-            eventData: (event) => eventData("hospital-treatment-created", {
-                treatmentId: event.treatmentId.toString(),
-                medicalCardId: event.medicationCardId.toString(),
-                doctorId: event.doctorId.toString()
+            eventData: (event) => jsonEvent({
+                type: "hospital-treatment-created",
+                data: {
+                    treatmentId: event.treatmentId.toString(),
+                    medicalCardId: event.medicationCardId.toString(),
+                }
             }),
-            event: (data) => new HospitalTreatmentCreated(new Guid(data.treatmentId), new Guid(data.medicalCardId), new Guid(data.doctorId))
+            event: (data) => new HospitalTreatmentCreated(new Guid(data.treatmentId), new Guid(data.medicalCardId))
         }
     }
     private get therapyAddedToHospitalTreatment(): EventStoreAdapter<TherapyAddedToHospitalTreatment, TherapyAddedToHospitalTreatmentEvent> {
         return {
-            eventData: (event) => eventData("therapy-added-to-treatment", {
-                treatmentId: event.treatmentId.toString(),
-                therapyId: event.therapyId.toString()
+            eventData: (event) => jsonEvent({
+                type: "therapy-added-to-treatment", data: {
+                    treatmentId: event.treatmentId.toString(),
+                    therapyId: event.therapyId.toString()
+                }
             }),
             event: (data) => new TherapyAddedToHospitalTreatment(new Guid(data.treatmentId), new Guid(data.therapyId))
         }

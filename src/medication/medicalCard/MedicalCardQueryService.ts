@@ -2,7 +2,9 @@ import Guid from "@common/Guid";
 
 export interface MedicalCardReadModel {
     id: string;
-    examinations: { examinationId: string, createdAt: string }[]
+    examinations: { examinationId: string, createdAt: string }[];
+    therapies: { therapyId: string, createdAt: string }[];
+    hospitalTreatments: { treatmentId: string, createdAt: string }[];
     createdAt: string;
 }
 

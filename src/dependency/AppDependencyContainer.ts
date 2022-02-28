@@ -12,12 +12,16 @@ import ReadWorker from '@common/ReadWorker';
 import { EventStoreDBClient } from '@eventstore/db-client';
 import ESExaminationRepository from '@medication/examination/persistance/ESExaminationRepository';
 import { ExaminationEventStore } from '@medication/examination/persistance/ExaminationEventStore';
+import ESHospitalTreatmentRepository from '@medication/hospitalTreatment/persistance/ESHospitalTreatmentRepository';
+import { HospitalTreatmentEventStore } from '@medication/hospitalTreatment/persistance/HospitalTreatmentEventStore';
 import DBMedicalCardQueryService from '@medication/medicalCard/persistance/DBMedicalCardQueryService';
 import ESMedicalCardRepository from '@medication/medicalCard/persistance/ESMedicalCardRepository';
 import { MedicalCardEventStore } from '@medication/medicalCard/persistance/MedicalCardEventStore';
 import MedicalCardReadWorker from '@medication/medicalCard/persistance/MedicalCardReadWorker';
 import MedicationEventHandler from '@medication/MedicationEventHandlers';
 import MedicationProcessor from '@medication/MedicationProcessor';
+import ESTherapyRepository from '@medication/therapy/persistance/ESTherapyRepository';
+import { TherapyEventStore } from '@medication/therapy/persistance/TherapyEventStore';
 
 import DependencyContainer, { Dependency } from './DependencyContainer';
 
@@ -48,10 +52,12 @@ export default class AppDependencyContainer implements DependencyContainer {
         const patientRepository = new MockPatientRepository()
         const medicalCardRepository = new ESMedicalCardRepository(client, new MedicalCardEventStore())
         const examinationRepository = new ESExaminationRepository(client, new ExaminationEventStore())
+        const therapyRepository = new ESTherapyRepository(client, new TherapyEventStore())
+        const treatmentRepository = new ESHospitalTreatmentRepository(client, new HospitalTreatmentEventStore())
 
         // Processors
         this._adminstrationProcessor = new AdminstrationProcessor(patientRepository, this._eventBus)
-        this._medicationProcessor = new MedicationProcessor(medicalCardRepository, examinationRepository, this._eventBus)
+        this._medicationProcessor = new MedicationProcessor(medicalCardRepository, examinationRepository, therapyRepository, treatmentRepository, this._eventBus)
 
         // EventHandlers
         this._medicationEventHandler = new MedicationEventHandler(medicalCardRepository)

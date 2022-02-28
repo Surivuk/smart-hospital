@@ -1,5 +1,5 @@
 import CommandChain from '@app/CommandChain';
-import CreateExamination from '@app/commands/MedicationCommands';
+import {CreateExamination} from '@app/commands/MedicationCommands';
 import NotEmptyStringField from '@common/fields/NotEmptyStringField';
 import Guid, { GuidFactory } from '@common/Guid';
 import { Request, Response } from 'express-serve-static-core';

@@ -3,7 +3,7 @@ import EventStoreEvent from "@common/EventStoreEvent";
 import Guid from "@common/Guid";
 
 export class TherapyCreated implements EventStoreEvent {
-    constructor(public readonly therapyId: Guid, public readonly treatmentId: Guid) { }
+    constructor(public readonly therapyId: Guid) { }
 }
 export class MedicationAddedToTherapy implements EventStoreEvent {
     constructor(public readonly therapyId: Guid, public readonly medication: MedicamentConsumption) { }

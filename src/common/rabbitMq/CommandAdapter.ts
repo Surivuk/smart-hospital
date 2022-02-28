@@ -7,7 +7,10 @@ import AddPatient from "@app/commands/AdministrationCommands";
 import Name from "@adminstration/Name";
 import Gender from "@adminstration/Gender";
 import NormalNumberField from "@common/fields/NormalNumberField";
-import CreateExamination from "@app/commands/MedicationCommands";
+import { CreateExamination, OpenHospitalTreatment, PrescribeTherapy } from "@app/commands/MedicationCommands";
+import MedicamentConsumption from "@medication/medicamentConsumption/MedicamentConsumption";
+import ConsumptionRoute from "@medication/medicamentConsumption/ConsumptionRoute";
+import ConsumptionFrequency from "@medication/medicamentConsumption/ConsumptionFrequency";
 
 interface CommandSerializer<T extends ChainCommand> {
     (event: T): any
@@ -37,13 +40,34 @@ export default class CommandAdapter {
             examinationId: examinationId.toString(),
             doctorId: doctorId.toString(),
             diagnose: diagnose.toString()
-        })
+        }),
+        [PrescribeTherapy.name]: ({ medicalCardId, therapyId, medicaments }: PrescribeTherapy) => ({
+            medicalCardId: medicalCardId.toString(),
+            therapyId: therapyId.toString(),
+            medicaments: medicaments.map(({ medicamentId, strength, amount, route, frequency }) => ({
+                medicamentId: medicamentId.toString(),
+                strength: strength.valueOf(),
+                amount: amount.valueOf(),
+                route: route.toString(),
+                frequency: frequency.toString()
+            }))
+        }),
+        [OpenHospitalTreatment.name]: ({ medicalCardId, treatmentId }: OpenHospitalTreatment) => ({
+            medicalCardId: medicalCardId.toString(),
+            treatmentId: treatmentId.toString()
+        }),
     }
     private readonly _deserializer: { [key: string]: CommandDeserializer<any> } = {
         [AddPatient.name]: ({ patientId, firstName, lastName, gender, birthYear }) =>
             new AddPatient(new Guid(patientId), Name.create(firstName, lastName), Gender.create(gender), NormalNumberField.create(birthYear)),
         [CreateExamination.name]: ({ medicalCardId, examinationId, doctorId, diagnose }) =>
-            new CreateExamination(new Guid(medicalCardId), new Guid(examinationId), new Guid(doctorId), NotEmptyStringField.create(diagnose))
+            new CreateExamination(new Guid(medicalCardId), new Guid(examinationId), new Guid(doctorId), NotEmptyStringField.create(diagnose)),
+        [PrescribeTherapy.name]: ({ medicalCardId, therapyId, medicaments }) =>
+            new PrescribeTherapy(new Guid(medicalCardId), new Guid(therapyId), medicaments.map(({ medicamentId, strength, amount, route, frequency }: any) =>
+                new MedicamentConsumption(new Guid(medicamentId), strength, amount, ConsumptionRoute.create(route), ConsumptionFrequency.create(frequency)))
+            ),
+        [OpenHospitalTreatment.name]: ({ medicalCardId, treatmentId }) =>
+            new OpenHospitalTreatment(new Guid(medicalCardId), new Guid(treatmentId)),
     }
 
 

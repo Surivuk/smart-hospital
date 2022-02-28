@@ -13,9 +13,9 @@ export default class HospitalTreatment extends AggregateRoot {
 
     private _therapies: Guid[] = [];
 
-    static create(id: Guid, medicalCardId: Guid, doctorId: Guid): HospitalTreatment {
+    static create(id: Guid, medicalCardId: Guid): HospitalTreatment {
         const result = new HospitalTreatment()
-        result.createHospitalTreatment(id, medicalCardId, doctorId)
+        result.createHospitalTreatment(id, medicalCardId)
         return result
     }
 
@@ -26,8 +26,8 @@ export default class HospitalTreatment extends AggregateRoot {
         this.applyChange(new TherapyRemovedFromHospitalTreatment(this.id, therapyId))
     }
 
-    private createHospitalTreatment(id: Guid, medicalCardId: Guid, doctorId: Guid) {
-        this.applyChange(new HospitalTreatmentCreated(id, medicalCardId, doctorId))
+    private createHospitalTreatment(id: Guid, medicalCardId: Guid) {
+        this.applyChange(new HospitalTreatmentCreated(id, medicalCardId))
     }
     private applyHospitalTreatmentCreated(event: HospitalTreatmentCreated) {
         this._id = event.treatmentId

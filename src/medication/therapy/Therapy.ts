@@ -11,13 +11,13 @@ export default class Therapy extends AggregateRoot {
 
     private _medications: Map<string, MedicamentConsumption> = new Map();
 
-    static create(id: Guid, medicalCardId: Guid): Therapy {
+    static create(id: Guid): Therapy {
         const therapy = new Therapy();
-        therapy.createTherapy(id, medicalCardId)
+        therapy.createTherapy(id)
         return therapy;
     }
-    private createTherapy(id: Guid, medicalCardId: Guid) {
-        this.applyChange(new TherapyCreated(id, medicalCardId))
+    private createTherapy(id: Guid) {
+        this.applyChange(new TherapyCreated(id))
     }
 
     addMedication(medication: MedicamentConsumption) {
