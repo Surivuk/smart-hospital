@@ -23,10 +23,10 @@ export default abstract class HttpServer {
                 ].join(' ')
             }))
             .use((err: Error, req: Request, res: Response, next: NextFunction) => {
-                console.error(`[HTTP API]: [Error] -> ${err.message}`)
+                console.error(`[HTTP API] [Error] -> ${err.message}`)
                 res.status(500).send('Something broke!')
             })
-        ).listen(port, () => console.log(`[HTTP API]: Listening on port ${port} ...`))
+        ).listen(port, () => console.log(`[HTTP API] Listening on port ${port} ...`))
     }
 
     protected abstract bindRoutes(app: Application): Application

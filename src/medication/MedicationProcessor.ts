@@ -1,6 +1,7 @@
 import CommandChain from "@app/CommandChain";
 import { CreateExamination, OpenHospitalTreatment, PrescribeTherapy } from "@app/commands/MedicationCommands";
 import EventBus from "@app/EventBus"
+import { HospitalTreatmentOpened } from "@events/MedicationEvents";
 import Examination from "./examination/Examination";
 import ExaminationRepository from "./examination/ExaminationRepository";
 import HospitalTreatment from "./hospitalTreatment/HospitalTreatment";
@@ -40,6 +41,7 @@ export default class MedicationProcessor {
                 await this._treatmentRepository.save(HospitalTreatment.create(treatmentId, medicalCardId))
                 medicalCard.noteHospitalTreatment(treatmentId)
                 await this._medicalCardRepository.save(medicalCard);
+                this._eventBus.emit(new HospitalTreatmentOpened(treatmentId))
             })
     }
 }

@@ -3,6 +3,8 @@ import MockDoctorQueryService from '@adminstration/doctor/MockPatientQueryServic
 import MockPatientRepository from '@adminstration/patient/MockPatientRepository';
 import MockPatientQueryService from '@app/adminstration/patient/MockPatientQueryService';
 import HttpApi from '@app/api/http/HttpApi';
+import MqttApi from '@app/api/mqtt/MqttApi';
+import MqttConnection from '@common/mqtt/MqttConnection';
 import CommandAdapter from '@common/rabbitMq/CommandAdapter';
 import DomainEventAdapters from '@common/rabbitMq/DomainEventAdapters';
 import { channel, connect } from '@common/rabbitMq/rabbitMq';
@@ -10,6 +12,7 @@ import RabbitMqCommandChain from '@common/rabbitMq/RabbitMqCommandChain';
 import RabbitMqEventBus from '@common/rabbitMq/RabbitMqEventBus';
 import ReadWorker from '@common/ReadWorker';
 import { EventStoreDBClient } from '@eventstore/db-client';
+import HealthDataEventHandlers from '@healthCenter/HealthDataEventHandlers';
 import ESExaminationRepository from '@medication/examination/persistance/ESExaminationRepository';
 import { ExaminationEventStore } from '@medication/examination/persistance/ExaminationEventStore';
 import ESHospitalTreatmentRepository from '@medication/hospitalTreatment/persistance/ESHospitalTreatmentRepository';
@@ -22,6 +25,9 @@ import MedicationEventHandler from '@medication/MedicationEventHandlers';
 import MedicationProcessor from '@medication/MedicationProcessor';
 import ESTherapyRepository from '@medication/therapy/persistance/ESTherapyRepository';
 import { TherapyEventStore } from '@medication/therapy/persistance/TherapyEventStore';
+import MonitoringEventHandlers from '@monitoring/MonitoringEventHandlers';
+import MonitoringProcessor from '@monitoring/MonitoringProcessor';
+import DBMonitoringRepository from '@monitoring/persistance/DBMonitoringRepository';
 
 import DependencyContainer, { Dependency } from './DependencyContainer';
 
@@ -29,15 +35,19 @@ import DependencyContainer, { Dependency } from './DependencyContainer';
 export default class AppDependencyContainer implements DependencyContainer {
     private _dependency!: Dependency
 
+    private _mqtt!: MqttConnection
     private _commandChain!: RabbitMqCommandChain
     private _eventBus!: RabbitMqEventBus
 
     // Processors
     private _adminstrationProcessor!: AdminstrationProcessor
     private _medicationProcessor!: MedicationProcessor
+    private _monitoringProcessor!: MonitoringProcessor
 
     // EventHandlers
     private _medicationEventHandler!: MedicationEventHandler
+    private _monitoringEventHandlers!: MonitoringEventHandlers
+    private _healthDataEventHandlers!: HealthDataEventHandlers
 
     // ReadWorkers
     private _readWorkers: ReadWorker[] = []
@@ -55,17 +65,23 @@ export default class AppDependencyContainer implements DependencyContainer {
         const therapyRepository = new ESTherapyRepository(client, new TherapyEventStore())
         const treatmentRepository = new ESHospitalTreatmentRepository(client, new HospitalTreatmentEventStore())
 
+        const monitoringRepository = new DBMonitoringRepository()
+
         // Processors
         this._adminstrationProcessor = new AdminstrationProcessor(patientRepository, this._eventBus)
         this._medicationProcessor = new MedicationProcessor(medicalCardRepository, examinationRepository, therapyRepository, treatmentRepository, this._eventBus)
+        this._monitoringProcessor = new MonitoringProcessor(monitoringRepository, this._eventBus)
 
         // EventHandlers
         this._medicationEventHandler = new MedicationEventHandler(medicalCardRepository)
+        this._monitoringEventHandlers = new MonitoringEventHandlers(monitoringRepository)
+        this._healthDataEventHandlers = new HealthDataEventHandlers()
 
         // ReadWorkers
         this._readWorkers.push(new MedicalCardReadWorker(client, new MedicalCardEventStore()))
 
         this._dependency = {
+            mqtt: this._mqtt,
             commandChain: this._commandChain,
             eventBus: this._eventBus,
 
@@ -78,6 +94,7 @@ export default class AppDependencyContainer implements DependencyContainer {
     }
 
     private async createChannels() {
+        this._mqtt = new MqttConnection("mqtt://localhost")
         const connection = await connect("amqp://localhost")
         const serverChannel = await channel(connection)
         const clientChannel = await channel(connection)
@@ -92,13 +109,16 @@ export default class AppDependencyContainer implements DependencyContainer {
     registerProcesses(): this {
         [
             this._adminstrationProcessor,
-            this._medicationProcessor
+            this._medicationProcessor,
+            this._monitoringProcessor
         ].forEach(processor => processor.registerProcesses(this._commandChain))
         return this;
     }
     registerHandlers(): this {
         [
-            this._medicationEventHandler
+            this._medicationEventHandler,
+            this._monitoringEventHandlers,
+            this._healthDataEventHandlers
         ].forEach(handler => handler.registerHandlers(this._eventBus))
         return this;
     }
@@ -110,5 +130,8 @@ export default class AppDependencyContainer implements DependencyContainer {
         this._readWorkers.forEach(worker => worker.work())
         return this;
     }
-
+    startMqttApi(): this {
+        new MqttApi(this._dependency).start()
+        return this;
+    }
 }

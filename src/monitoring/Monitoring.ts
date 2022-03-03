@@ -29,6 +29,6 @@ export default class Monitoring {
         const monitor = this._monitors[type];
         if (monitor === undefined) throw new MonitoringError(`Not supported type. Provided type: "${type}"`)
         return monitor;
-
     }
+    
 }

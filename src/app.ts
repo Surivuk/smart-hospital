@@ -7,10 +7,11 @@ async function main() {
         .registerHandlers()
         .registerProcesses()
         .startHttpApi()
+        .startMqttApi()
 
 }
 main()
     .then(() => { console.log("[APPLICATION] Started") })
-    .catch((err) => console.log(err))
+    .catch((err) => console.log("[APPLICATION]", err))
 
 

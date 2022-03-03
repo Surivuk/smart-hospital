@@ -11,6 +11,7 @@ import { CreateExamination, OpenHospitalTreatment, PrescribeTherapy } from "@app
 import MedicamentConsumption from "@medication/medicamentConsumption/MedicamentConsumption";
 import ConsumptionRoute from "@medication/medicamentConsumption/ConsumptionRoute";
 import ConsumptionFrequency from "@medication/medicamentConsumption/ConsumptionFrequency";
+import { ProcessHealthData } from "@app/commands/MonitoringCommands";
 
 interface CommandSerializer<T extends ChainCommand> {
     (event: T): any
@@ -56,6 +57,10 @@ export default class CommandAdapter {
             medicalCardId: medicalCardId.toString(),
             treatmentId: treatmentId.toString()
         }),
+        [ProcessHealthData.name]: ({ monitoringId, data }: ProcessHealthData) => ({
+            monitoringId: monitoringId.toString(),
+            data
+        }),
     }
     private readonly _deserializer: { [key: string]: CommandDeserializer<any> } = {
         [AddPatient.name]: ({ patientId, firstName, lastName, gender, birthYear }) =>
@@ -68,6 +73,8 @@ export default class CommandAdapter {
             ),
         [OpenHospitalTreatment.name]: ({ medicalCardId, treatmentId }) =>
             new OpenHospitalTreatment(new Guid(medicalCardId), new Guid(treatmentId)),
+        [ProcessHealthData.name]: ({ monitoringId, data }) =>
+            new ProcessHealthData(new Guid(monitoringId), data),
     }
 
 

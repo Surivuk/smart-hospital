@@ -2,6 +2,7 @@ import { DomainEvent } from "@app/EventBus";
 import { HealthDataReceived } from "@events/MonitoringEvents";
 import Guid from "@common/Guid";
 import { PatientAdded } from "@events/AdministrationEvents";
+import { HospitalTreatmentOpened } from "@events/MedicationEvents";
 
 interface JsonAdapter<T extends DomainEvent> {
     (event: T): any
@@ -19,12 +20,14 @@ export class DomainEventAdapterError extends Error {
 export default class DomainEventAdapters {
 
     private readonly _jsonAdapters: { [key: string]: JsonAdapter<any> } = {
-        [PatientAdded.name]: ({ patientId }: PatientAdded) => ({
-            patientId: patientId.toString(),
-        })
+        [PatientAdded.name]: ({ patientId }: PatientAdded) => ({ patientId: patientId.toString() }),
+        [HospitalTreatmentOpened.name]: ({ treatmentId }: HospitalTreatmentOpened) => ({ treatmentId: treatmentId.toString() }),
+        [HealthDataReceived.name]: ({ treatmentId, healthData }: HealthDataReceived) => ({ treatmentId: treatmentId.toString(), ...healthData })
     }
     private readonly _eventAdapters: { [key: string]: EventAdapter<any> } = {
-        [PatientAdded.name]: ({ patientId }) => new PatientAdded(new Guid(patientId))
+        [PatientAdded.name]: ({ patientId }) => new PatientAdded(new Guid(patientId)),
+        [HospitalTreatmentOpened.name]: ({ treatmentId }) => new HospitalTreatmentOpened(new Guid(treatmentId)),
+        [HealthDataReceived.name]: ({ treatmentId, type, timestamp, value }) => new HealthDataReceived(new Guid(treatmentId), { type, timestamp, value })
     }
 
 
