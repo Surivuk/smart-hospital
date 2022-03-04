@@ -8,18 +8,15 @@ import { RedisClientType } from '@node-redis/client/dist/lib/client';
 class HospitalTreatment {
     public treatmentId: string;
     public medicalCardId: string;
-    public doctorId: string;
     public therapies: string[];
 
     constructor(data: {
         treatmentId: string,
         medicalCardId: string,
-        doctorId: string,
         therapies: string[]
     }) {
         this.treatmentId = data.treatmentId;
         this.medicalCardId = data.medicalCardId;
-        this.doctorId = data.doctorId;
         this.therapies = data.therapies;
     }
 

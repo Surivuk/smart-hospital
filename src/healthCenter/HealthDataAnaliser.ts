@@ -4,7 +4,7 @@ import Guid from "@common/Guid";
 import HealthData from "./healthData/HealthData";
 import { AddedMonitoredValue } from "./MonitoringEvents";
 import Timestamp from "./Timestamp";
-import Saturation from "./healthData/Saturation";
+import SPO2 from "./healthData/SPO2";
 
 export type ReadData = {
     timestamp: number;
@@ -23,7 +23,7 @@ export default class HealthCenter extends AggregateRoot {
     private _lastValue: HealthData | undefined;
 
     processData(data: ReadData): void {
-        const value = new Saturation(data.timestamp, parseInt(data.values[0].value));
+        const value = new SPO2(data.timestamp, parseInt(data.values[0].value));
         if (this._lastValue !== undefined && !this.hasSameStatus(value, this._lastValue)) {
             if (this._lastTimestamp !== this._lastValue.timestamp())
                 this.applyChange(new AddedMonitoredValue(new Guid("mm1"), this._lastValue))

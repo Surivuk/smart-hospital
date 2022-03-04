@@ -12,7 +12,15 @@ import RabbitMqCommandChain from '@common/rabbitMq/RabbitMqCommandChain';
 import RabbitMqEventBus from '@common/rabbitMq/RabbitMqEventBus';
 import ReadWorker from '@common/ReadWorker';
 import { EventStoreDBClient } from '@eventstore/db-client';
-import HealthDataEventHandlers from '@healthCenter/HealthDataEventHandlers';
+import HealthCenterEventHandlers from '@healthCenter/HealthCenterEventHandlers';
+import DiastolicBloodPressure from '@healthCenter/healthData/DiastolicBloodPressure';
+import PI from '@healthCenter/healthData/PI';
+import Pulse from '@healthCenter/healthData/Pulse';
+import SPO2 from '@healthCenter/healthData/SPO2';
+import SystolicBloodPressure from '@healthCenter/healthData/SystolicBloodPressure';
+import Temperature from '@healthCenter/healthData/Temperature';
+import HealthStorage from '@healthCenter/HealthStorage';
+import DBHealthDataRepository from '@healthCenter/persistance/DBHealthDataRepository';
 import ESExaminationRepository from '@medication/examination/persistance/ESExaminationRepository';
 import { ExaminationEventStore } from '@medication/examination/persistance/ExaminationEventStore';
 import ESHospitalTreatmentRepository from '@medication/hospitalTreatment/persistance/ESHospitalTreatmentRepository';
@@ -47,7 +55,7 @@ export default class AppDependencyContainer implements DependencyContainer {
     // EventHandlers
     private _medicationEventHandler!: MedicationEventHandler
     private _monitoringEventHandlers!: MonitoringEventHandlers
-    private _healthDataEventHandlers!: HealthDataEventHandlers
+    private _healthDataEventHandlers!: HealthCenterEventHandlers
 
     // ReadWorkers
     private _readWorkers: ReadWorker[] = []
@@ -66,6 +74,7 @@ export default class AppDependencyContainer implements DependencyContainer {
         const treatmentRepository = new ESHospitalTreatmentRepository(client, new HospitalTreatmentEventStore())
 
         const monitoringRepository = new DBMonitoringRepository()
+        const healthDataRepository = new DBHealthDataRepository()
 
         // Processors
         this._adminstrationProcessor = new AdminstrationProcessor(patientRepository, this._eventBus)
@@ -75,7 +84,14 @@ export default class AppDependencyContainer implements DependencyContainer {
         // EventHandlers
         this._medicationEventHandler = new MedicationEventHandler(medicalCardRepository)
         this._monitoringEventHandlers = new MonitoringEventHandlers(monitoringRepository)
-        this._healthDataEventHandlers = new HealthDataEventHandlers()
+        this._healthDataEventHandlers = new HealthCenterEventHandlers(new HealthStorage(healthDataRepository, {
+            SPO2: (timestamp, value) => new SPO2(timestamp, parseInt(value)),
+            "systolic-blood-pressure": (timestamp, value) => new SystolicBloodPressure(timestamp, parseInt(value)),
+            "diastolic-blood-pressure": (timestamp, value) => new DiastolicBloodPressure(timestamp, parseInt(value)),
+            PI: (timestamp, value) => new PI(timestamp, parseInt(value)),
+            pulse: (timestamp, value) => new Pulse(timestamp, parseInt(value)),
+            temperature: (timestamp, value) => new Temperature(timestamp, parseInt(value)),
+        }))
 
         // ReadWorkers
         this._readWorkers.push(new MedicalCardReadWorker(client, new MedicalCardEventStore()))

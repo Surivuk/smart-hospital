@@ -1,11 +1,11 @@
 import HealthData from "./HealthData";
 
-export default class Saturation extends HealthData {
+export default class SPO2 extends HealthData {
 
     constructor(private readonly _timestamp: number, private readonly _value: number) { super() }
 
     type(): string {
-        return "saturation";
+        return "SPO2";
     }
     value(): string {
         return `${this._value}`;

@@ -1,13 +1,16 @@
+import Guid, { GuidFactory } from "@common/Guid";
 import HealthData from "@healthCenter/healthData/HealthData";
 import HealthDataRepository from "@healthCenter/HealthDataRepository";
 import HealthStorage, { ReceivedHealthData } from "@healthCenter/HealthStorage";
+
+const TREATMENT_ID = GuidFactory.guid()
 
 const seconds = (amount: number) => 1000 * amount;
 const minutes = (amount: number) => seconds(60) * amount;
 
 class MockHealthDataRepository implements HealthDataRepository {
     public data: HealthData[] = []
-    async save(healthData: HealthData[]): Promise<void> {
+    async save(treatmentId: Guid, healthData: HealthData[]): Promise<void> {
         this.data = this.data.concat(healthData);
     }
 }
@@ -54,7 +57,7 @@ describe('When healthStorage store a data in normal range', () => {
     beforeAll(async () => {
         repository = new MockHealthDataRepository()
         let storage = createStorage(repository)
-        await storage.storeHealthData(data("data_a", "5"))
+        await storage.storeHealthData(TREATMENT_ID, data("data_a", "5"))
     })
     test('should be only one record', () => {
         expect(repository.data.length).toBe(1)
@@ -69,9 +72,9 @@ describe('When healthStorage received multiple data in normal range, in short pe
     beforeAll(async () => {
         repository = new MockHealthDataRepository()
         let storage = createStorage(repository)
-        await storage.storeHealthData(data("data_a", "5"))
-        await storage.storeHealthData(data("data_a", "6"))
-        await storage.storeHealthData(data("data_a", "7"))
+        await storage.storeHealthData(TREATMENT_ID, data("data_a", "5"))
+        await storage.storeHealthData(TREATMENT_ID, data("data_a", "6"))
+        await storage.storeHealthData(TREATMENT_ID, data("data_a", "7"))
     })
     test('should store only one record', () => {
         expect(repository.data.length).toBe(1)
@@ -87,10 +90,10 @@ describe('When healthStorage received data in different ranges', () => {
     beforeAll(async () => {
         repository = new MockHealthDataRepository()
         let storage = createStorage(repository)
-        await storage.storeHealthData(data("data_a", "5"))
-        await storage.storeHealthData(data("data_a", "11"))
-        await storage.storeHealthData(data("data_a", "21"))
-        await storage.storeHealthData(data("data_a", "4"))
+        await storage.storeHealthData(TREATMENT_ID, data("data_a", "5"))
+        await storage.storeHealthData(TREATMENT_ID, data("data_a", "11"))
+        await storage.storeHealthData(TREATMENT_ID, data("data_a", "21"))
+        await storage.storeHealthData(TREATMENT_ID, data("data_a", "4"))
     })
     test('should store four records', () => {
         expect(repository.data.length).toBe(4)
@@ -108,19 +111,19 @@ describe('When healthStorage received data with different type in normal range',
     beforeAll(async () => {
         repository = new MockHealthDataRepository()
         let storage = createStorage(repository)
-        await storage.storeHealthData(data("data_a", "5"))
-        await storage.storeHealthData(data("data_b", "6"))
-        await storage.storeHealthData(data("data_a", "7"))
-        await storage.storeHealthData(data("data_b", "8"))
+        await storage.storeHealthData(TREATMENT_ID, data("data_a", "5"))
+        await storage.storeHealthData(TREATMENT_ID, data("data_b", "6"))
+        await storage.storeHealthData(TREATMENT_ID, data("data_a", "7"))
+        await storage.storeHealthData(TREATMENT_ID, data("data_b", "8"))
     })
     test('should store two record', () => {
         expect(repository.data.length).toBe(2)
     });
-    test('should store (data_a) first record', () => {
+    test('should store (TREATMENT_ID, data_a) first record', () => {
         expect(repository.data[0].type()).toBe("data_a")
         expect(repository.data[0].value()).toBe("5")
     });
-    test('should store (data_b) first record', () => {
+    test('should store (TREATMENT_ID, data_b) first record', () => {
         expect(repository.data[1].type()).toBe("data_b")
         expect(repository.data[1].value()).toBe("6")
     });
@@ -131,10 +134,10 @@ describe('When healthStorage received data with same type and in normal range bu
     beforeAll(async () => {
         repository = new MockHealthDataRepository()
         let storage = createStorage(repository)
-        await storage.storeHealthData(data("data_a", "5", 0))
-        await storage.storeHealthData(data("data_a", "6", seconds(60)))
-        await storage.storeHealthData(data("data_a", "7", seconds(61)))
-        await storage.storeHealthData(data("data_a", "8", seconds(120)))
+        await storage.storeHealthData(TREATMENT_ID, data("data_a", "5", 0))
+        await storage.storeHealthData(TREATMENT_ID, data("data_a", "6", seconds(60)))
+        await storage.storeHealthData(TREATMENT_ID, data("data_a", "7", seconds(61)))
+        await storage.storeHealthData(TREATMENT_ID, data("data_a", "8", seconds(120)))
     })
     test('should store tree records', () => {
         expect(repository.data.length).toBe(3)
@@ -151,10 +154,10 @@ describe('When healthStorage received data with same type and in warning range b
     beforeAll(async () => {
         repository = new MockHealthDataRepository()
         let storage = createStorage(repository)
-        await storage.storeHealthData(data("data_a", "15", 0))
-        await storage.storeHealthData(data("data_a", "16", seconds(30)))
-        await storage.storeHealthData(data("data_a", "17", seconds(31)))
-        await storage.storeHealthData(data("data_a", "18", seconds(60)))
+        await storage.storeHealthData(TREATMENT_ID, data("data_a", "15", 0))
+        await storage.storeHealthData(TREATMENT_ID, data("data_a", "16", seconds(30)))
+        await storage.storeHealthData(TREATMENT_ID, data("data_a", "17", seconds(31)))
+        await storage.storeHealthData(TREATMENT_ID, data("data_a", "18", seconds(60)))
     })
     test('should store tree records', () => {
         expect(repository.data.length).toBe(3)
@@ -171,10 +174,10 @@ describe('When healthStorage received data with same type and in critical range 
     beforeAll(async () => {
         repository = new MockHealthDataRepository()
         let storage = createStorage(repository)
-        await storage.storeHealthData(data("data_a", "25", 0))
-        await storage.storeHealthData(data("data_a", "26", seconds(10)))
-        await storage.storeHealthData(data("data_a", "27", seconds(11)))
-        await storage.storeHealthData(data("data_a", "28", seconds(20)))
+        await storage.storeHealthData(TREATMENT_ID, data("data_a", "25", 0))
+        await storage.storeHealthData(TREATMENT_ID, data("data_a", "26", seconds(10)))
+        await storage.storeHealthData(TREATMENT_ID, data("data_a", "27", seconds(11)))
+        await storage.storeHealthData(TREATMENT_ID, data("data_a", "28", seconds(20)))
     })
     test('should store tree records', () => {
         expect(repository.data.length).toBe(3)
@@ -191,12 +194,12 @@ describe('When healthStorage received data with same type but in different range
     beforeAll(async () => {
         repository = new MockHealthDataRepository()
         let storage = createStorage(repository)
-        await storage.storeHealthData(data("data_a", "5", seconds(0)))
-        await storage.storeHealthData(data("data_a", "16", seconds(1)))
-        await storage.storeHealthData(data("data_a", "27", seconds(3)))
-        await storage.storeHealthData(data("data_a", "8", seconds(4)))
-        await storage.storeHealthData(data("data_a", "7", seconds(5)))
-        await storage.storeHealthData(data("data_a", "6", seconds(64)))
+        await storage.storeHealthData(TREATMENT_ID, data("data_a", "5", seconds(0)))
+        await storage.storeHealthData(TREATMENT_ID, data("data_a", "16", seconds(1)))
+        await storage.storeHealthData(TREATMENT_ID, data("data_a", "27", seconds(3)))
+        await storage.storeHealthData(TREATMENT_ID, data("data_a", "8", seconds(4)))
+        await storage.storeHealthData(TREATMENT_ID, data("data_a", "7", seconds(5)))
+        await storage.storeHealthData(TREATMENT_ID, data("data_a", "6", seconds(64)))
     })
     test('should store five records', () => {
         expect(repository.data.length).toBe(5)

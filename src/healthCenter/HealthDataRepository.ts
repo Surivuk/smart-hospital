@@ -1,5 +1,6 @@
+import Guid from "@common/Guid";
 import HealthData from "./healthData/HealthData";
 
 export default interface HealthDataRepository {
-    save(healthData: HealthData[]): Promise<void>;
+    save(treatmentId: Guid, healthData: HealthData[]): Promise<void>;
 }

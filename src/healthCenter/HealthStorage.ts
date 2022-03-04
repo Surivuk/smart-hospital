@@ -4,7 +4,7 @@ import Guid from "@common/Guid";
 import HealthData from "./healthData/HealthData";
 import { AddedMonitoredValue } from "./MonitoringEvents";
 import Timestamp from "./Timestamp";
-import Saturation from "./healthData/Saturation";
+import SPO2 from "./healthData/SPO2";
 import HealthDataRepository from "./HealthDataRepository";
 
 export type ReceivedHealthData = {
@@ -26,7 +26,7 @@ export default class HealthStorage {
         this._lastSavedTimestamp = 0;
     }
 
-    async storeHealthData({ type, timestamp, value }: ReceivedHealthData) {
+    async storeHealthData(treatment: Guid, { type, timestamp, value }: ReceivedHealthData) {
         const healthData = this._healthDataFactory[type](timestamp, value);
         if (healthData === undefined) {
             console.log(`Not found any health data factory for provided type. Type: "${type}"`)
@@ -38,7 +38,7 @@ export default class HealthStorage {
 
         const forStoring: HealthData[] = this.findDataForStorage(lastData, healthData)
         if (forStoring.length > 0) {
-            await this._repository.save(forStoring)
+            await this._repository.save(treatment, forStoring)
             this._lastSavedTimestamp = forStoring[forStoring.length - 1].timestamp()
             this._lastReceivedValue.set(type, { timestamp, value })
         }
