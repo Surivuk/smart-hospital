@@ -14,9 +14,9 @@ export default class TriggerOperation {
     }
 
     triggered(referentValue: string, arrivedValue: string): boolean {
-        if (this.isBoolean(referentValue) && this.isBoolean(arrivedValue)) return this.eval(this.boolean(referentValue), this.boolean(arrivedValue))
-        if (this.isNumber(referentValue) && this.isNumber(arrivedValue)) return this.eval(this.number(referentValue), this.number(arrivedValue))
-        return this.eval(referentValue, arrivedValue);
+        if (this.isBoolean(referentValue) && this.isBoolean(arrivedValue)) return this.check(this.boolean(referentValue), this.boolean(arrivedValue))
+        if (this.isNumber(referentValue) && this.isNumber(arrivedValue)) return this.check(this.number(referentValue), this.number(arrivedValue))
+        return this.check(referentValue, arrivedValue);
     }
 
     private isBoolean(value: string): boolean {
@@ -33,8 +33,10 @@ export default class TriggerOperation {
             return parseInt(value)
         return parseFloat(value)
     }
-    private eval(a: any, b: any): boolean {
-        return eval(`${a} ${this._operation} ${b}`)
+    private check(a: any, b: any): boolean {
+        if(this._operation === "<") return b < a;
+        if(this._operation === ">") return b > a;
+        return a === b;
     }
 
     toString() {

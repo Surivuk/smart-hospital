@@ -76,15 +76,15 @@ export default class DBAlarmRepository extends KnexConnector implements AlarmRep
         }
     }
 
-    private toAlarm(data: any, triggers: any[]): Alarm {
+    private toAlarm(alarm: any, triggers: any[]): Alarm {
         return new Alarm(
-            new Guid(data.id),
-            AlarmOperator.create(data.operation),
-            NotEmptyStringField.create(data.name),
+            new Guid(alarm.id),
+            AlarmOperator.create(alarm.operator),
+            NotEmptyStringField.create(alarm.name),
             triggers.map(trigger => new AlarmTrigger(
                 NotEmptyStringField.create(trigger.key),
                 NotEmptyStringField.create(trigger.value),
-                TriggerOperation.create(trigger.operation)
+                TriggerOperation.create(trigger.operator)
             ))
         )
     }

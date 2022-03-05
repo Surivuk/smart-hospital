@@ -16,7 +16,7 @@ export default class DBAlarmQueryService extends KnexConnector implements AlarmQ
             const triggers = await this.knex("alarm_triggers").where({ alarm: alarm[0].id })
             return this.toAlarmReadModel(alarm[0], triggers)
         } catch (error) {
-            throw new DBAlarmQueryServiceError(`[alarms] - ${error.message}`);
+            throw new DBAlarmQueryServiceError(`[alarm] - ${error.message}`);
         }
     }
     async alarms(doctorId: Guid): Promise<AlarmReadModel[]> {

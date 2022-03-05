@@ -12,12 +12,13 @@ export class DBAlarmNotificationRepositoryError extends Error {
 export default class DBAlarmNotificationRepository extends KnexConnector implements AlarmNotificationRepository {
     async saveAlarmNotification(healthData: HealthData, alarms: Alarm[]): Promise<void> {
         try {
-            await this.knex("alarm_notifications").insert(alarms.map(alarm => ({
-                id: alarm.id.toString(),
-                data_type: healthData.type,
-                data_value: healthData.value,
-                created_at: this.knex.fn.now()
-            })))
+            if (alarms.length > 0)
+                await this.knex("alarm_notifications").insert(alarms.map(alarm => ({
+                    alarm: alarm.id.toString(),
+                    data_type: healthData.type,
+                    data_value: healthData.value,
+                    created_at: this.knex.fn.now()
+                })))
         } catch (error) {
             throw new DBAlarmNotificationRepositoryError(`[saveAlarmNotification] - ${error.message}`);
         }
