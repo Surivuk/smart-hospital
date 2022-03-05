@@ -20,6 +20,7 @@ import SPO2 from '@healthCenter/healthData/SPO2';
 import SystolicBloodPressure from '@healthCenter/healthData/SystolicBloodPressure';
 import Temperature from '@healthCenter/healthData/Temperature';
 import HealthStorage from '@healthCenter/HealthStorage';
+import DBHealthDataQueryService from '@healthCenter/persistance/DBHealthDataQueryService';
 import DBHealthDataRepository from '@healthCenter/persistance/DBHealthDataRepository';
 import ESExaminationRepository from '@medication/examination/persistance/ESExaminationRepository';
 import { ExaminationEventStore } from '@medication/examination/persistance/ExaminationEventStore';
@@ -104,7 +105,8 @@ export default class AppDependencyContainer implements DependencyContainer {
             // QueryServices
             patientQueryService: new MockPatientQueryService(),
             doctorQueryService: new MockDoctorQueryService(),
-            medicalCardQueryService: new DBMedicalCardQueryService()
+            medicalCardQueryService: new DBMedicalCardQueryService(),
+            healthDataQueryService: new DBHealthDataQueryService()
         }
         return this;
     }

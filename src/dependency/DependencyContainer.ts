@@ -3,6 +3,7 @@ import PatientQueryService from '@app/adminstration/patient/PatientQueryService'
 import CommandChain from '@app/CommandChain';
 import EventBus from '@app/EventBus';
 import MqttConnection from '@common/mqtt/MqttConnection';
+import HealthDataQueryService from '@healthCenter/HealthDataQueryService';
 import MedicalCardQueryService from '@medication/medicalCard/MedicalCardQueryService';
 
 export interface Dependency {
@@ -14,6 +15,7 @@ export interface Dependency {
     patientQueryService: PatientQueryService;
     doctorQueryService: DoctorQueryService;
     medicalCardQueryService: MedicalCardQueryService;
+    healthDataQueryService: HealthDataQueryService
 }
 
 export default interface DependencyContainer {

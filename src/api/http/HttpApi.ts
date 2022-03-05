@@ -1,10 +1,13 @@
 import DoctorsController from "@app/api/http/routers/doctors/DoctorsController";
 import { Dependency } from "@app/dependency/DependencyContainer";
 import HttpServer from "@common/http/HttpServer";
+import HealthCenter from "@healthCenter/HealthDataAnaliser";
 import { Application } from "express";
 import DoctorRouter from "./routers/doctors/DoctorRouter";
 import ExaminationsController from "./routers/examination/ExaminationsController";
 import ExaminationsRouter from "./routers/examination/ExaminationsRouter";
+import HealthCenterController from "./routers/healthCeneter/HealthCenterController";
+import HealthCenterRouter from "./routers/healthCeneter/HealthCenterRouter";
 import MedicalCardsController from "./routers/medicalCards/MedicalCardsController";
 import MedicalCardsRouter from "./routers/medicalCards/MedicalCardsRouter";
 import PatientsController from "./routers/patients/PatientsController";
@@ -31,5 +34,6 @@ export default class HttpApi extends HttpServer {
             .use("/examinations", new ExaminationsRouter(new ExaminationsController(this._dependency.commandChain)).router())
             .use("/therapies", new TherapiesRouter(new TherapiesController(this._dependency.commandChain)).router())
             .use("/treatments", new TreatmentsRouter(new TreatmentsController(this._dependency.commandChain)).router())
+            .use("/health-center", new HealthCenterRouter(new HealthCenterController(this._dependency.healthDataQueryService)).router())
     }
 }
