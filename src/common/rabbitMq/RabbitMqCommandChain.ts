@@ -75,7 +75,8 @@ export default class RabbitMqCommandChain implements CommandChain {
             if (ack.type === "success")
                 return;
             else
-                console.log(`[COMMAND CHAIN] ${ack.value}`);
+                throw new Error(`[${command.constructor.name}] - ${ack.value}`)
+            // console.log(`[COMMAND CHAIN] ${ack.value}`);
         }
         else
             console.log("[COMMAND CHAIN] Command not sent")

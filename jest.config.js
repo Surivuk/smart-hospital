@@ -17,6 +17,7 @@ module.exports = {
     "^@healthCenter/(.*)$": "<rootDir>/src/healthCenter/$1",
     "^@monitoring/(.*)$": "<rootDir>/src/monitoring/$1",
     "^@common/(.*)$": "<rootDir>/src/common/$1",
+    "^@alarming/(.*)$": "<rootDir>/src/alarming/$1",
     "^@events/(.*)$": "<rootDir>/src/events/$1",
   },
   collectCoverage: true,

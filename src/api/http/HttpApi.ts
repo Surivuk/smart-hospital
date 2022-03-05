@@ -3,6 +3,8 @@ import { Dependency } from "@app/dependency/DependencyContainer";
 import HttpServer from "@common/http/HttpServer";
 import HealthCenter from "@healthCenter/HealthDataAnaliser";
 import { Application } from "express";
+import AlarmingController from "./routers/alarming/AlarmingController";
+import AlarmingRouter from "./routers/alarming/AlarmingRouter";
 import DoctorRouter from "./routers/doctors/DoctorRouter";
 import ExaminationsController from "./routers/examination/ExaminationsController";
 import ExaminationsRouter from "./routers/examination/ExaminationsRouter";
@@ -35,5 +37,6 @@ export default class HttpApi extends HttpServer {
             .use("/therapies", new TherapiesRouter(new TherapiesController(this._dependency.commandChain)).router())
             .use("/treatments", new TreatmentsRouter(new TreatmentsController(this._dependency.commandChain)).router())
             .use("/health-center", new HealthCenterRouter(new HealthCenterController(this._dependency.healthDataQueryService)).router())
+            .use("/alarming", new AlarmingRouter(new AlarmingController(this._dependency.alarmQueryService, this._dependency.commandChain)).router())
     }
 }

@@ -12,6 +12,11 @@ import MedicamentConsumption from "@medication/medicamentConsumption/MedicamentC
 import ConsumptionRoute from "@medication/medicamentConsumption/ConsumptionRoute";
 import ConsumptionFrequency from "@medication/medicamentConsumption/ConsumptionFrequency";
 import { ProcessHealthData } from "@app/commands/MonitoringCommands";
+import { ActivateAlarm, CreateAlarm, DeactivateAlarm } from "@app/commands/AlarmingCommands";
+import Alarm from "@app/alarming/alarm/Alarm";
+import AlarmOperator from "@app/alarming/alarm/AlarmOperator";
+import AlarmTrigger from "@app/alarming/alarm/AlarmTrigger";
+import TriggerOperation from "@app/alarming/alarm/TriggerOperation";
 
 interface CommandSerializer<T extends ChainCommand> {
     (event: T): any
@@ -53,14 +58,11 @@ export default class CommandAdapter {
                 frequency: frequency.toString()
             }))
         }),
-        [OpenHospitalTreatment.name]: ({ medicalCardId, treatmentId }: OpenHospitalTreatment) => ({
-            medicalCardId: medicalCardId.toString(),
-            treatmentId: treatmentId.toString()
-        }),
-        [ProcessHealthData.name]: ({ monitoringId, data }: ProcessHealthData) => ({
-            monitoringId: monitoringId.toString(),
-            data
-        }),
+        [OpenHospitalTreatment.name]: ({ medicalCardId, treatmentId }: OpenHospitalTreatment) => ({ medicalCardId: medicalCardId.toString(), treatmentId: treatmentId.toString() }),
+        [ProcessHealthData.name]: ({ monitoringId, data }: ProcessHealthData) => ({ monitoringId: monitoringId.toString(), data }),
+        [CreateAlarm.name]: ({ doctorId, treatmentId, alarm }: CreateAlarm) => ({ doctorId: doctorId.toString(), treatmentId: treatmentId.toString(), ...alarm.dto() }),
+        [ActivateAlarm.name]: ({ alarmId }: ActivateAlarm) => ({ alarmId: alarmId.toString() }),
+        [DeactivateAlarm.name]: ({ alarmId }: DeactivateAlarm) => ({ alarmId: alarmId.toString() }),
     }
     private readonly _deserializer: { [key: string]: CommandDeserializer<any> } = {
         [AddPatient.name]: ({ patientId, firstName, lastName, gender, birthYear }) =>
@@ -71,10 +73,24 @@ export default class CommandAdapter {
             new PrescribeTherapy(new Guid(medicalCardId), new Guid(therapyId), medicaments.map(({ medicamentId, strength, amount, route, frequency }: any) =>
                 new MedicamentConsumption(new Guid(medicamentId), strength, amount, ConsumptionRoute.create(route), ConsumptionFrequency.create(frequency)))
             ),
-        [OpenHospitalTreatment.name]: ({ medicalCardId, treatmentId }) =>
-            new OpenHospitalTreatment(new Guid(medicalCardId), new Guid(treatmentId)),
-        [ProcessHealthData.name]: ({ monitoringId, data }) =>
-            new ProcessHealthData(new Guid(monitoringId), data),
+        [OpenHospitalTreatment.name]: ({ medicalCardId, treatmentId }) => new OpenHospitalTreatment(new Guid(medicalCardId), new Guid(treatmentId)),
+        [ProcessHealthData.name]: ({ monitoringId, data }) => new ProcessHealthData(new Guid(monitoringId), data),
+        [CreateAlarm.name]: ({ doctorId, treatmentId, id, operator, name, triggers }) => new CreateAlarm(
+            Guid.create(doctorId),
+            Guid.create(treatmentId),
+            new Alarm(
+                id,
+                AlarmOperator.create(operator),
+                NotEmptyStringField.create(name),
+                triggers.map((trigger: any) => new AlarmTrigger(
+                    NotEmptyStringField.create(trigger.key),
+                    NotEmptyStringField.create(trigger.value),
+                    TriggerOperation.create(trigger.operator)
+                ))
+            )
+        ),
+        [ActivateAlarm.name]: ({ alarmId }) => new ActivateAlarm(new Guid(alarmId)),
+        [DeactivateAlarm.name]: ({ alarmId }) => new DeactivateAlarm(new Guid(alarmId)),
     }
 
 

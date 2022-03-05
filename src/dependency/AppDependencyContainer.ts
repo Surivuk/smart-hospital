@@ -2,6 +2,11 @@ import AdminstrationProcessor from '@adminstration/AdminstrationProcessor';
 import MockDoctorQueryService from '@adminstration/doctor/MockPatientQueryService';
 import MockPatientRepository from '@adminstration/patient/MockPatientRepository';
 import MockPatientQueryService from '@app/adminstration/patient/MockPatientQueryService';
+import AlarmingEventHandlers from '@app/alarming/AlarmingEventHandlers';
+import AlarmingProcessor from '@app/alarming/AlarmingProcessor';
+import DBAlarmNotificationRepository from '@app/alarming/perstitance/DBAlarmNotificationRepository';
+import DBAlarmQueryService from '@app/alarming/perstitance/DBAlarmQueryService';
+import DBAlarmRepository from '@app/alarming/perstitance/DBAlarmRepository';
 import HttpApi from '@app/api/http/HttpApi';
 import MqttApi from '@app/api/mqtt/MqttApi';
 import MqttConnection from '@common/mqtt/MqttConnection';
@@ -52,11 +57,13 @@ export default class AppDependencyContainer implements DependencyContainer {
     private _adminstrationProcessor!: AdminstrationProcessor
     private _medicationProcessor!: MedicationProcessor
     private _monitoringProcessor!: MonitoringProcessor
+    private _alarmingProcessor!: AlarmingProcessor
 
     // EventHandlers
     private _medicationEventHandler!: MedicationEventHandler
     private _monitoringEventHandlers!: MonitoringEventHandlers
     private _healthDataEventHandlers!: HealthCenterEventHandlers
+    private _alarmingEventHandlers!: AlarmingEventHandlers
 
     // ReadWorkers
     private _readWorkers: ReadWorker[] = []
@@ -76,11 +83,14 @@ export default class AppDependencyContainer implements DependencyContainer {
 
         const monitoringRepository = new DBMonitoringRepository()
         const healthDataRepository = new DBHealthDataRepository()
+        const alarmRepository = new DBAlarmRepository()
+        const alarmNotificationRepository = new DBAlarmNotificationRepository()
 
         // Processors
         this._adminstrationProcessor = new AdminstrationProcessor(patientRepository, this._eventBus)
         this._medicationProcessor = new MedicationProcessor(medicalCardRepository, examinationRepository, therapyRepository, treatmentRepository, this._eventBus)
         this._monitoringProcessor = new MonitoringProcessor(monitoringRepository, this._eventBus)
+        this._alarmingProcessor = new AlarmingProcessor(this._eventBus, alarmRepository);
 
         // EventHandlers
         this._medicationEventHandler = new MedicationEventHandler(medicalCardRepository)
@@ -93,6 +103,7 @@ export default class AppDependencyContainer implements DependencyContainer {
             pulse: (timestamp, value) => new Pulse(timestamp, parseInt(value)),
             temperature: (timestamp, value) => new Temperature(timestamp, parseInt(value)),
         }))
+        this._alarmingEventHandlers = new AlarmingEventHandlers(alarmRepository, alarmNotificationRepository)
 
         // ReadWorkers
         this._readWorkers.push(new MedicalCardReadWorker(client, new MedicalCardEventStore()))
@@ -106,7 +117,8 @@ export default class AppDependencyContainer implements DependencyContainer {
             patientQueryService: new MockPatientQueryService(),
             doctorQueryService: new MockDoctorQueryService(),
             medicalCardQueryService: new DBMedicalCardQueryService(),
-            healthDataQueryService: new DBHealthDataQueryService()
+            healthDataQueryService: new DBHealthDataQueryService(),
+            alarmQueryService: new DBAlarmQueryService()
         }
         return this;
     }
@@ -128,7 +140,8 @@ export default class AppDependencyContainer implements DependencyContainer {
         [
             this._adminstrationProcessor,
             this._medicationProcessor,
-            this._monitoringProcessor
+            this._monitoringProcessor,
+            this._alarmingProcessor
         ].forEach(processor => processor.registerProcesses(this._commandChain))
         return this;
     }
@@ -136,7 +149,8 @@ export default class AppDependencyContainer implements DependencyContainer {
         [
             this._medicationEventHandler,
             this._monitoringEventHandlers,
-            this._healthDataEventHandlers
+            this._healthDataEventHandlers,
+            this._alarmingEventHandlers
         ].forEach(handler => handler.registerHandlers(this._eventBus))
         return this;
     }

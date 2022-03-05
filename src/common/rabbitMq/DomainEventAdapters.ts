@@ -3,6 +3,7 @@ import { HealthDataReceived } from "@events/MonitoringEvents";
 import Guid from "@common/Guid";
 import { PatientAdded } from "@events/AdministrationEvents";
 import { HospitalTreatmentOpened } from "@events/MedicationEvents";
+import { AlarmTriggered } from "@events/AlarmingEvents";
 
 interface JsonAdapter<T extends DomainEvent> {
     (event: T): any
@@ -22,12 +23,14 @@ export default class DomainEventAdapters {
     private readonly _jsonAdapters: { [key: string]: JsonAdapter<any> } = {
         [PatientAdded.name]: ({ patientId }: PatientAdded) => ({ patientId: patientId.toString() }),
         [HospitalTreatmentOpened.name]: ({ treatmentId }: HospitalTreatmentOpened) => ({ treatmentId: treatmentId.toString() }),
-        [HealthDataReceived.name]: ({ treatmentId, healthData }: HealthDataReceived) => ({ treatmentId: treatmentId.toString(), ...healthData })
+        [HealthDataReceived.name]: ({ treatmentId, healthData }: HealthDataReceived) => ({ treatmentId: treatmentId.toString(), ...healthData }),
+        [AlarmTriggered.name]: ({ treatmentId, alarmId, healthData }: AlarmTriggered) => ({ treatmentId: treatmentId.toString(), alarmId: alarmId.toString(), ...healthData })
     }
     private readonly _eventAdapters: { [key: string]: EventAdapter<any> } = {
         [PatientAdded.name]: ({ patientId }) => new PatientAdded(new Guid(patientId)),
         [HospitalTreatmentOpened.name]: ({ treatmentId }) => new HospitalTreatmentOpened(new Guid(treatmentId)),
-        [HealthDataReceived.name]: ({ treatmentId, type, timestamp, value }) => new HealthDataReceived(new Guid(treatmentId), { type, timestamp, value })
+        [HealthDataReceived.name]: ({ treatmentId, type, timestamp, value }) => new HealthDataReceived(new Guid(treatmentId), { type, timestamp, value }),
+        [AlarmTriggered.name]: ({ treatmentId, alarmId, type, timestamp, value }) => new AlarmTriggered(new Guid(treatmentId), new Guid(alarmId), { type, timestamp, value })
     }
 
 
