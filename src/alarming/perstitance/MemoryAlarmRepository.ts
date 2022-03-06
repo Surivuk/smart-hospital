@@ -4,26 +4,25 @@ import AlarmRepository from "../alarm/AlarmRepository";
 
 export default class MemoryAlarmRepository implements AlarmRepository {
 
-    private readonly _cache: Map<string, Alarm> = new Map()
+    private readonly _cache: Map<string, Alarm[]> = new Map()
 
     constructor(private readonly _repo: AlarmRepository) { }
 
-    async createAlarm(doctorId: Guid, treatmentId: Guid, alarm: Alarm): Promise<void> {
-        await this._repo.createAlarm(doctorId, treatmentId, alarm)
-        this._cache.set(alarm.id.toString(), alarm)
+    async createAlarm(doctorId: Guid, alarm: Alarm): Promise<void> {
+        await this._repo.createAlarm(doctorId, alarm)
+        this.addAlarm(alarm);
     }
     async deleteAlarm(id: Guid): Promise<void> {
         await this._repo.deleteAlarm(id)
-        this._cache.delete(id.toString())
+        this.removeAlarm(id);
     }
     async activateAlarm(id: Guid): Promise<void> {
         await this._repo.activateAlarm(id)
-        const alarm = await this._repo.alarm(id)
-        this._cache.set(alarm.id.toString(), alarm)
+        this.addAlarm(await this._repo.alarm(id))
     }
     async deactivateAlarm(id: Guid): Promise<void> {
         await this._repo.deactivateAlarm(id)
-        this._cache.delete(id.toString())
+        this.removeAlarm(id)
     }
     async alarm(id: Guid): Promise<Alarm> {
         return await this._repo.alarm(id);
@@ -32,9 +31,26 @@ export default class MemoryAlarmRepository implements AlarmRepository {
         if (this._cache.size === 0) {
             const alarms = await this._repo.activeAlarms(treatmentId)
             this._cache.clear()
-            alarms.forEach(alarm => this._cache.set(alarm.id.toString(), alarm))
+            this._cache.set(treatmentId.toString(), alarms)
         }
-        return Array.from(this._cache.values());
+        return Array.from(this._cache.get(treatmentId.toString()) as Alarm[]);
     }
 
-} 
+    private addAlarm(alarm: Alarm) {
+        const { treatmentId } = alarm.dto();
+        if (this._cache.get(treatmentId)) {
+            const alarms = this._cache.get(treatmentId) as Alarm[];
+            alarms.push(alarm);
+            this._cache.set(treatmentId, alarms);
+        }
+        else
+            this._cache.set(treatmentId, [alarm]);
+    }
+    private removeAlarm(id: Guid) {
+        this._cache.forEach((alarms) => {
+            const index = alarms.findIndex(alarm => alarm.id.equals(id))
+            if (index !== -1)
+                alarms.splice(index, 1)
+        })
+    }
+}

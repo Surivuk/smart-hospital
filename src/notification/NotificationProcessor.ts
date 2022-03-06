@@ -1,10 +1,10 @@
 import CommandChain from '@app/CommandChain';
 import EventBus from '@app/EventBus';
+import AppSocket from '@common/webSocket/AppSocket';
 
 export default class NotificationProcessor {
 
-    constructor(
-    ) { }
+    constructor() { }
 
     registerProcesses(commandChain: CommandChain) {
         commandChain

@@ -21,9 +21,9 @@ export default class AlarmingController {
         const alarmId = GuidFactory.guid()
         await this._commandChain.process(new CreateAlarm(
             Guid.create(doctorId),
-            Guid.create(treatmentId),
             new Alarm(
                 alarmId,
+                Guid.create(treatmentId),
                 AlarmOperator.create(operator),
                 NotEmptyStringField.create(name),
                 new AlarmTrigger(

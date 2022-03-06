@@ -11,7 +11,8 @@ export class AlarmError extends Error {
 }
 
 export type AlarmDTO = {
-    id: string,
+    id: string;
+    treatmentId: string;
     operator: string;
     name: string;
     trigger: AlarmTriggerDTO
@@ -20,6 +21,7 @@ export type AlarmDTO = {
 export default class Alarm {
     constructor(
         public readonly id: Guid,
+        private readonly _treatmentId: Guid,
         private readonly _operator: AlarmOperator,
         private readonly _name: StringField,
         private readonly _trigger: AlarmTrigger
@@ -33,6 +35,7 @@ export default class Alarm {
     dto(): AlarmDTO {
         return {
             id: this.id.toString(),
+            treatmentId: this._treatmentId.toString(),
             operator: this._operator.toString(),
             name: this._name.toString(),
             trigger: this._trigger.dto()

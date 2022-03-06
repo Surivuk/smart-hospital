@@ -30,16 +30,15 @@ export default class DBAlarmQueryService extends KnexConnector implements AlarmQ
     }
 
     private toAlarmReadModel(alarm: any, triggers: any[]): AlarmReadModel {
-        const myTriggers = triggers.filter(trigger => trigger.alarm === alarm.id)
+        const trigger = triggers.filter(trigger => trigger.alarm === alarm.id)[0]
         return {
             id: alarm.id,
-            operator: alarm.operation,
-            triggers: myTriggers.map(trigger => ({
+            operator: alarm.operator,
+            trigger: {
                 key: trigger.key,
                 value: trigger.value,
-                operation: trigger.operation,
-                created_at: trigger.created_at
-            })),
+                operator: trigger.operator
+            },
             active: alarm.active
         }
     }

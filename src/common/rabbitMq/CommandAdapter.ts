@@ -60,7 +60,7 @@ export default class CommandAdapter {
         }),
         [OpenHospitalTreatment.name]: ({ medicalCardId, treatmentId }: OpenHospitalTreatment) => ({ medicalCardId: medicalCardId.toString(), treatmentId: treatmentId.toString() }),
         [ProcessHealthData.name]: ({ monitoringId, data }: ProcessHealthData) => ({ monitoringId: monitoringId.toString(), data }),
-        [CreateAlarm.name]: ({ doctorId, treatmentId, alarm }: CreateAlarm) => ({ doctorId: doctorId.toString(), treatmentId: treatmentId.toString(), ...alarm.dto() }),
+        [CreateAlarm.name]: ({ doctorId, alarm }: CreateAlarm) => ({ doctorId: doctorId.toString(), ...alarm.dto() }),
         [ActivateAlarm.name]: ({ alarmId }: ActivateAlarm) => ({ alarmId: alarmId.toString() }),
         [DeactivateAlarm.name]: ({ alarmId }: DeactivateAlarm) => ({ alarmId: alarmId.toString() }),
         [DeleteAlarm.name]: ({ alarmId }: DeleteAlarm) => ({ alarmId: alarmId.toString() }),
@@ -78,9 +78,9 @@ export default class CommandAdapter {
         [ProcessHealthData.name]: ({ monitoringId, data }) => new ProcessHealthData(new Guid(monitoringId), data),
         [CreateAlarm.name]: ({ doctorId, treatmentId, id, operator, name, trigger }) => new CreateAlarm(
             Guid.create(doctorId),
-            Guid.create(treatmentId),
             new Alarm(
                 id,
+                Guid.create(treatmentId),
                 AlarmOperator.create(operator),
                 NotEmptyStringField.create(name),
                 new AlarmTrigger(

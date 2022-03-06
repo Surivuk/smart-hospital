@@ -12,8 +12,8 @@ export default class AlarmingProcessor {
 
     registerProcesses(commandChain: CommandChain) {
         commandChain
-            .registerProcessor<CreateAlarm>(CreateAlarm.name, async ({ doctorId, treatmentId, alarm }) => {
-                await this._alarmRepository.createAlarm(doctorId, treatmentId, alarm)
+            .registerProcessor<CreateAlarm>(CreateAlarm.name, async ({ doctorId, alarm }) => {
+                await this._alarmRepository.createAlarm(doctorId, alarm)
             })
             .registerProcessor<ActivateAlarm>(ActivateAlarm.name, async ({ alarmId }) => {
                 await this._alarmRepository.activateAlarm(alarmId)

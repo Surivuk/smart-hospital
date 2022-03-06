@@ -19,6 +19,7 @@ import { channel, connect } from '@common/rabbitMq/rabbitMq';
 import RabbitMqCommandChain from '@common/rabbitMq/RabbitMqCommandChain';
 import RabbitMqEventBus from '@common/rabbitMq/RabbitMqEventBus';
 import ReadWorker from '@common/ReadWorker';
+import AppSocket from '@common/webSocket/AppSocket';
 import { EventStoreDBClient } from '@eventstore/db-client';
 import HealthCenterEventHandlers from '@healthCenter/HealthCenterEventHandlers';
 import DiastolicBloodPressure from '@healthCenter/healthData/DiastolicBloodPressure';
@@ -73,6 +74,8 @@ export default class AppDependencyContainer implements DependencyContainer {
     // ReadWorkers
     private _readWorkers: ReadWorker[] = []
 
+    private _webSocket!: AppSocket;
+
     constructor(private readonly _config: any) { }
 
     async createDependency(): Promise<this> {
@@ -110,7 +113,7 @@ export default class AppDependencyContainer implements DependencyContainer {
             temperature: (timestamp, value) => new Temperature(timestamp, parseInt(value)),
         }))
         this._alarmingEventHandlers = new AlarmingEventHandlers(alarmRepository, alarmNotificationRepository)
-        this._notificationEventHandlers = new NotificationEventHandlers()
+        this._notificationEventHandlers = new NotificationEventHandlers(this._webSocket)
 
         // ReadWorkers
         this._readWorkers.push(new MedicalCardReadWorker(client, new MedicalCardEventStore()))
@@ -164,7 +167,9 @@ export default class AppDependencyContainer implements DependencyContainer {
         return this;
     }
     startHttpApi(): this {
-        new HttpApi(this._dependency).start(this._config.port)
+        const httpApi = new HttpApi(this._dependency)
+        this._webSocket = new AppSocket(httpApi.io);
+        httpApi.start(this._config.port)
         return this;
     }
     startReadWorkers(): this {

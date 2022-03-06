@@ -3,11 +3,11 @@ import Guid from "@common/Guid";
 export type AlarmReadModel = {
     id: string,
     operator: string;
-    triggers: {
+    trigger: {
         key: string;
         value: string;
-        operation: string
-    }[]
+        operator: string
+    }
     active: boolean;
 }
 

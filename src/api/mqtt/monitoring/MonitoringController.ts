@@ -14,6 +14,6 @@ export default class MonitoringController {
         if (!defined(timestamp)) throw new Error(`[MonitoringController] - Timestamp is undefined`)
         if (!defined(value)) throw new Error(`[MonitoringController] - Type is undefined`)
         if (isNaN(parseInt(timestamp))) throw new Error(`[MonitoringController] - Timestamp is not valid format`)
-        this._commandChain.process(new ProcessHealthData(monitoringId, { type, timestamp, value }))
+        await this._commandChain.process(new ProcessHealthData(monitoringId, { type, timestamp, value }))
     }
 }

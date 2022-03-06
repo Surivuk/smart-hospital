@@ -15,17 +15,17 @@ export class DBAlarmRepositoryError extends Error {
 }
 
 export default class DBAlarmRepository extends KnexConnector implements AlarmRepository {
-    async createAlarm(doctorId: Guid, treatmentId: Guid, alarm: Alarm): Promise<void> {
+    async createAlarm(doctorId: Guid, alarm: Alarm): Promise<void> {
         let trx!: Knex.Transaction
         try {
             trx = await this.knex.transaction()
-            const { id, name, operator, trigger } = alarm.dto()
+            const { id, name, operator, trigger, treatmentId } = alarm.dto()
             await this.knex("alarm")
                 .transacting(trx)
                 .insert({
                     id,
                     doctor: doctorId.toString(),
-                    hospital_treatment: treatmentId.toString(),
+                    hospital_treatment: treatmentId,
                     name,
                     operator,
                     created_at: this.knex.fn.now()
@@ -90,6 +90,7 @@ export default class DBAlarmRepository extends KnexConnector implements AlarmRep
         const trigger = triggers.filter(trigger => trigger.alarm === alarm.id)[0]
         return new Alarm(
             new Guid(alarm.id),
+            new Guid(alarm.hospital_treatment),
             AlarmOperator.create(alarm.operator),
             NotEmptyStringField.create(alarm.name),
             new AlarmTrigger(
