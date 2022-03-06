@@ -9,7 +9,7 @@ export default class HealthCenterEventHandlers {
     registerHandlers(eventBus: EventBus) {
         eventBus
             .on<HealthDataReceived>(HealthDataReceived.name, async ({ treatmentId, healthData }) => {
-                this._storage.storeHealthData(treatmentId, healthData)
+                await this._storage.storeHealthData(treatmentId, healthData)
             })
     }
 }

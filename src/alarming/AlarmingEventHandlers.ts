@@ -14,7 +14,7 @@ export default class AlarmingEventHandlers {
     registerHandlers(eventBus: EventBus) {
         eventBus
             .on<HealthDataReceived>(HealthDataReceived.name, async ({ treatmentId, healthData }) => {
-                const triggeredAlarms = (await this._alarmRepository.alarms(treatmentId)).filter(alarm => alarm.triggered(healthData))
+                const triggeredAlarms = (await this._alarmRepository.activeAlarms(treatmentId)).filter(alarm => alarm.triggered(healthData))
                 await this._alarmNotificationRepository.saveAlarmNotification(healthData, triggeredAlarms)
                 triggeredAlarms.map(alarm => new AlarmTriggered(treatmentId, alarm.id, healthData)).forEach(event => eventBus.emit(event))
             })

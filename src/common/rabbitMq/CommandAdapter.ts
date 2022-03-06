@@ -12,7 +12,7 @@ import MedicamentConsumption from "@medication/medicamentConsumption/MedicamentC
 import ConsumptionRoute from "@medication/medicamentConsumption/ConsumptionRoute";
 import ConsumptionFrequency from "@medication/medicamentConsumption/ConsumptionFrequency";
 import { ProcessHealthData } from "@app/commands/MonitoringCommands";
-import { ActivateAlarm, CreateAlarm, DeactivateAlarm } from "@app/commands/AlarmingCommands";
+import { ActivateAlarm, CreateAlarm, DeactivateAlarm, DeleteAlarm } from "@app/commands/AlarmingCommands";
 import Alarm from "@app/alarming/alarm/Alarm";
 import AlarmOperator from "@app/alarming/alarm/AlarmOperator";
 import AlarmTrigger from "@app/alarming/alarm/AlarmTrigger";
@@ -63,6 +63,7 @@ export default class CommandAdapter {
         [CreateAlarm.name]: ({ doctorId, treatmentId, alarm }: CreateAlarm) => ({ doctorId: doctorId.toString(), treatmentId: treatmentId.toString(), ...alarm.dto() }),
         [ActivateAlarm.name]: ({ alarmId }: ActivateAlarm) => ({ alarmId: alarmId.toString() }),
         [DeactivateAlarm.name]: ({ alarmId }: DeactivateAlarm) => ({ alarmId: alarmId.toString() }),
+        [DeleteAlarm.name]: ({ alarmId }: DeleteAlarm) => ({ alarmId: alarmId.toString() }),
     }
     private readonly _deserializer: { [key: string]: CommandDeserializer<any> } = {
         [AddPatient.name]: ({ patientId, firstName, lastName, gender, birthYear }) =>
@@ -75,22 +76,23 @@ export default class CommandAdapter {
             ),
         [OpenHospitalTreatment.name]: ({ medicalCardId, treatmentId }) => new OpenHospitalTreatment(new Guid(medicalCardId), new Guid(treatmentId)),
         [ProcessHealthData.name]: ({ monitoringId, data }) => new ProcessHealthData(new Guid(monitoringId), data),
-        [CreateAlarm.name]: ({ doctorId, treatmentId, id, operator, name, triggers }) => new CreateAlarm(
+        [CreateAlarm.name]: ({ doctorId, treatmentId, id, operator, name, trigger }) => new CreateAlarm(
             Guid.create(doctorId),
             Guid.create(treatmentId),
             new Alarm(
                 id,
                 AlarmOperator.create(operator),
                 NotEmptyStringField.create(name),
-                triggers.map((trigger: any) => new AlarmTrigger(
+                new AlarmTrigger(
                     NotEmptyStringField.create(trigger.key),
                     NotEmptyStringField.create(trigger.value),
                     TriggerOperation.create(trigger.operator)
-                ))
+                )
             )
         ),
         [ActivateAlarm.name]: ({ alarmId }) => new ActivateAlarm(new Guid(alarmId)),
         [DeactivateAlarm.name]: ({ alarmId }) => new DeactivateAlarm(new Guid(alarmId)),
+        [DeleteAlarm.name]: ({ alarmId }) => new DeleteAlarm(new Guid(alarmId)),
     }
 
 

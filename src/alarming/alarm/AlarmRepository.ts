@@ -7,5 +7,6 @@ export default interface AlarmRepository {
     activateAlarm(id: Guid): Promise<void>;
     deactivateAlarm(id: Guid): Promise<void>;
 
-    alarms(treatmentId: Guid): Promise<Alarm[]>;
+    alarm(id: Guid): Promise<Alarm>;
+    activeAlarms(treatmentId: Guid): Promise<Alarm[]>;
 }

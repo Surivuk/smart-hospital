@@ -4,7 +4,7 @@ import AlarmQueryService from '@app/alarming/alarm/AlarmQueryService';
 import AlarmTrigger from '@app/alarming/alarm/AlarmTrigger';
 import TriggerOperation from '@app/alarming/alarm/TriggerOperation';
 import CommandChain from '@app/CommandChain';
-import { ActivateAlarm, CreateAlarm, DeactivateAlarm } from '@app/commands/AlarmingCommands';
+import { ActivateAlarm, CreateAlarm, DeactivateAlarm, DeleteAlarm } from '@app/commands/AlarmingCommands';
 import NotEmptyStringField from '@common/fields/NotEmptyStringField';
 import Guid, { GuidFactory } from '@common/Guid';
 import { Request, Response } from 'express-serve-static-core';
@@ -17,7 +17,7 @@ export default class AlarmingController {
     ) { }
 
     async createAlarm(req: Request, res: Response) {
-        const { doctorId, treatmentId, name, operator, triggers } = req.body
+        const { doctorId, treatmentId, name, operator, trigger } = req.body
         const alarmId = GuidFactory.guid()
         await this._commandChain.process(new CreateAlarm(
             Guid.create(doctorId),
@@ -26,11 +26,11 @@ export default class AlarmingController {
                 alarmId,
                 AlarmOperator.create(operator),
                 NotEmptyStringField.create(name),
-                triggers.map((trigger: any) => new AlarmTrigger(
+                new AlarmTrigger(
                     NotEmptyStringField.create(trigger.key),
                     NotEmptyStringField.create(trigger.value),
                     TriggerOperation.create(trigger.operator)
-                ))
+                )
             )
         ))
         res.header("Location", `/alarm/${alarmId.toString()}`)
@@ -42,6 +42,10 @@ export default class AlarmingController {
     }
     async deactivateAlarm(req: Request, res: Response) {
         await this._commandChain.process(new DeactivateAlarm(Guid.create(req.params.id)))
+        res.sendStatus(204);
+    }
+    async deleteAlarm(req: Request, res: Response) {
+        await this._commandChain.process(new DeleteAlarm(Guid.create(req.params.id)))
         res.sendStatus(204);
     }
     async alarms(req: Request, res: Response) {

@@ -11,3 +11,6 @@ export class ActivateAlarm implements ChainCommand {
 export class DeactivateAlarm implements ChainCommand {
     constructor(public readonly alarmId: Guid) { }
 }
+export class DeleteAlarm implements ChainCommand {
+    constructor(public readonly alarmId: Guid) { }
+}

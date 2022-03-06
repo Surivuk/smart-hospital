@@ -7,7 +7,7 @@ export default class RabbitMqEventBus implements EventBus {
 
     private _queue!: amqp.Replies.AssertQueue
     private readonly _exchanger = "domain.event"
-    private readonly _handlers: Map<string, EventHandler<any>> = new Map()
+    private readonly _handlers: { eventName: string, handler: EventHandler<any> }[] = []
 
     constructor(private readonly _channel: amqp.Channel, private readonly _adapter: DomainEventAdapters) { }
 
@@ -21,9 +21,9 @@ export default class RabbitMqEventBus implements EventBus {
             if (msg.content) {
                 try {
                     const { eventName, data } = JSON.parse(msg.content.toString())
-                    const eventHandler = this._handlers.get(eventName)
-                    if (eventHandler === undefined) throw new Error(`Not found handler for event. Event: "${eventName}"`)
-                    await eventHandler(this._adapter.toEvent(eventName, data))
+                    const eventHandlers = this.handlers(eventName)
+                    if (eventHandlers.length === 0) throw new Error(`Not found handler for event. Event: "${eventName}"`)
+                    await Promise.all(eventHandlers.map(handler => handler(this._adapter.toEvent(eventName, data))))
                 } catch (error) {
                     console.log(`[EVENT BUS] - ${error.message}`)
                 }
@@ -32,7 +32,7 @@ export default class RabbitMqEventBus implements EventBus {
     }
 
     on<T extends DomainEvent>(eventName: string, eventHandler: EventHandler<T>): this {
-        this._handlers.set(eventName, eventHandler)
+        this._handlers.push({ eventName, handler: eventHandler })
         return this;
     }
     emit(event: DomainEvent): void {
@@ -42,5 +42,8 @@ export default class RabbitMqEventBus implements EventBus {
 
     private assertExchange(exchanger: string) {
         this._channel.assertExchange(exchanger, 'fanout', { durable: false, autoDelete: true });
+    }
+    private handlers(eName: string) {
+        return this._handlers.filter(({ eventName }) => eventName === eName).map(({ handler }) => handler)
     }
 }

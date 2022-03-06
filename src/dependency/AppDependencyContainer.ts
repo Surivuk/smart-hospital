@@ -7,8 +7,11 @@ import AlarmingProcessor from '@app/alarming/AlarmingProcessor';
 import DBAlarmNotificationRepository from '@app/alarming/perstitance/DBAlarmNotificationRepository';
 import DBAlarmQueryService from '@app/alarming/perstitance/DBAlarmQueryService';
 import DBAlarmRepository from '@app/alarming/perstitance/DBAlarmRepository';
+import MemoryAlarmRepository from '@app/alarming/perstitance/MemoryAlarmRepository';
 import HttpApi from '@app/api/http/HttpApi';
 import MqttApi from '@app/api/mqtt/MqttApi';
+import NotificationEventHandlers from '@app/notification/NotificationEventHandlers';
+import NotificationProcessor from '@app/notification/NotificationProcessor';
 import MqttConnection from '@common/mqtt/MqttConnection';
 import CommandAdapter from '@common/rabbitMq/CommandAdapter';
 import DomainEventAdapters from '@common/rabbitMq/DomainEventAdapters';
@@ -58,12 +61,14 @@ export default class AppDependencyContainer implements DependencyContainer {
     private _medicationProcessor!: MedicationProcessor
     private _monitoringProcessor!: MonitoringProcessor
     private _alarmingProcessor!: AlarmingProcessor
+    private _notificationProcessor!: NotificationProcessor;
 
     // EventHandlers
     private _medicationEventHandler!: MedicationEventHandler
     private _monitoringEventHandlers!: MonitoringEventHandlers
     private _healthDataEventHandlers!: HealthCenterEventHandlers
     private _alarmingEventHandlers!: AlarmingEventHandlers
+    private _notificationEventHandlers!: NotificationEventHandlers
 
     // ReadWorkers
     private _readWorkers: ReadWorker[] = []
@@ -83,7 +88,7 @@ export default class AppDependencyContainer implements DependencyContainer {
 
         const monitoringRepository = new DBMonitoringRepository()
         const healthDataRepository = new DBHealthDataRepository()
-        const alarmRepository = new DBAlarmRepository()
+        const alarmRepository = new MemoryAlarmRepository(new DBAlarmRepository())
         const alarmNotificationRepository = new DBAlarmNotificationRepository()
 
         // Processors
@@ -91,6 +96,7 @@ export default class AppDependencyContainer implements DependencyContainer {
         this._medicationProcessor = new MedicationProcessor(medicalCardRepository, examinationRepository, therapyRepository, treatmentRepository, this._eventBus)
         this._monitoringProcessor = new MonitoringProcessor(monitoringRepository, this._eventBus)
         this._alarmingProcessor = new AlarmingProcessor(this._eventBus, alarmRepository);
+        this._notificationProcessor = new NotificationProcessor();
 
         // EventHandlers
         this._medicationEventHandler = new MedicationEventHandler(medicalCardRepository)
@@ -104,6 +110,7 @@ export default class AppDependencyContainer implements DependencyContainer {
             temperature: (timestamp, value) => new Temperature(timestamp, parseInt(value)),
         }))
         this._alarmingEventHandlers = new AlarmingEventHandlers(alarmRepository, alarmNotificationRepository)
+        this._notificationEventHandlers = new NotificationEventHandlers()
 
         // ReadWorkers
         this._readWorkers.push(new MedicalCardReadWorker(client, new MedicalCardEventStore()))
@@ -141,7 +148,8 @@ export default class AppDependencyContainer implements DependencyContainer {
             this._adminstrationProcessor,
             this._medicationProcessor,
             this._monitoringProcessor,
-            this._alarmingProcessor
+            this._alarmingProcessor,
+            this._notificationProcessor
         ].forEach(processor => processor.registerProcesses(this._commandChain))
         return this;
     }
@@ -150,7 +158,8 @@ export default class AppDependencyContainer implements DependencyContainer {
             this._medicationEventHandler,
             this._monitoringEventHandlers,
             this._healthDataEventHandlers,
-            this._alarmingEventHandlers
+            this._alarmingEventHandlers,
+            this._notificationEventHandlers
         ].forEach(handler => handler.registerHandlers(this._eventBus))
         return this;
     }

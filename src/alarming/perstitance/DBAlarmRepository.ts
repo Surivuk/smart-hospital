@@ -19,7 +19,7 @@ export default class DBAlarmRepository extends KnexConnector implements AlarmRep
         let trx!: Knex.Transaction
         try {
             trx = await this.knex.transaction()
-            const { id, name, operator, triggers } = alarm.dto()
+            const { id, name, operator, trigger } = alarm.dto()
             await this.knex("alarm")
                 .transacting(trx)
                 .insert({
@@ -32,13 +32,13 @@ export default class DBAlarmRepository extends KnexConnector implements AlarmRep
                 })
             await this.knex("alarm_triggers")
                 .transacting(trx)
-                .insert(triggers.map(trigger => ({
+                .insert({
                     alarm: id,
                     key: trigger.key,
                     value: trigger.value,
                     operator: trigger.operator,
                     created_at: this.knex.fn.now()
-                })))
+                })
             await trx.commit()
         } catch (error) {
             await trx.rollback()
@@ -66,9 +66,19 @@ export default class DBAlarmRepository extends KnexConnector implements AlarmRep
             throw new DBAlarmRepositoryError(`[deactivateAlarm] - ${error.message}`);
         }
     }
-    async alarms(treatmentId: Guid): Promise<Alarm[]> {
+    async alarm(id: Guid): Promise<Alarm> {
         try {
-            const alarms = await this.knex("alarm").where({ hospital_treatment: treatmentId.toString() })
+            const alarm = await this.knex("alarm").where({ id: id.toString() })
+            if (alarm.length === 0) throw new Error(`Not found alarm for provided id. Id: "${id.toString()}"`)
+            const triggers = await this.knex("alarm_triggers").where({ alarm: alarm[0].id });
+            return this.toAlarm(alarm[0], triggers)
+        } catch (error) {
+            throw new DBAlarmRepositoryError(`[alarm] - ${error.message}`);
+        }
+    }
+    async activeAlarms(treatmentId: Guid): Promise<Alarm[]> {
+        try {
+            const alarms = await this.knex("alarm").where({ hospital_treatment: treatmentId.toString(), active: true })
             const triggers = await this.knex("alarm_triggers").whereIn("alarm", alarms.map(alarm => alarm.id));
             return alarms.map(row => this.toAlarm(row, triggers))
         } catch (error) {
@@ -77,15 +87,16 @@ export default class DBAlarmRepository extends KnexConnector implements AlarmRep
     }
 
     private toAlarm(alarm: any, triggers: any[]): Alarm {
+        const trigger = triggers.filter(trigger => trigger.alarm === alarm.id)[0]
         return new Alarm(
             new Guid(alarm.id),
             AlarmOperator.create(alarm.operator),
             NotEmptyStringField.create(alarm.name),
-            triggers.map(trigger => new AlarmTrigger(
+            new AlarmTrigger(
                 NotEmptyStringField.create(trigger.key),
                 NotEmptyStringField.create(trigger.value),
                 TriggerOperation.create(trigger.operator)
-            ))
+            )
         )
     }
 

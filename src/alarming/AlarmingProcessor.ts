@@ -1,5 +1,5 @@
 import CommandChain from "@app/CommandChain";
-import { ActivateAlarm, CreateAlarm, DeactivateAlarm } from "@app/commands/AlarmingCommands";
+import { ActivateAlarm, CreateAlarm, DeactivateAlarm, DeleteAlarm } from "@app/commands/AlarmingCommands";
 import EventBus from "@app/EventBus";
 import AlarmRepository from "./alarm/AlarmRepository";
 
@@ -20,6 +20,9 @@ export default class AlarmingProcessor {
             })
             .registerProcessor<DeactivateAlarm>(DeactivateAlarm.name, async ({ alarmId }) => {
                 await this._alarmRepository.deactivateAlarm(alarmId)
+            })
+            .registerProcessor<DeleteAlarm>(DeleteAlarm.name, async ({ alarmId }) => {
+                await this._alarmRepository.deleteAlarm(alarmId)
             })
     }
 }
