@@ -5,9 +5,9 @@ import Guid from "@common/Guid";
 export class TherapyCreated implements EventStoreEvent {
     constructor(public readonly therapyId: Guid) { }
 }
-export class MedicationAddedToTherapy implements EventStoreEvent {
-    constructor(public readonly therapyId: Guid, public readonly medication: MedicamentConsumption) { }
+export class MedicamentAddedToTherapy implements EventStoreEvent {
+    constructor(public readonly therapyId: Guid, public readonly medicament: MedicamentConsumption) { }
 }
-export class MedicationRemovedFromTherapy implements EventStoreEvent {
-    constructor(public readonly therapyId: Guid, public readonly medicationId: Guid) { }
+export class MedicamentRemovedFromTherapy implements EventStoreEvent {
+    constructor(public readonly therapyId: Guid, public readonly medicamentId: Guid) { }
 }

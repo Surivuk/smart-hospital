@@ -19,13 +19,14 @@ export default class RabbitMqEventBus implements EventBus {
         this._channel.consume(queueName, async (msg) => {
             if (msg === null) return;
             if (msg.content) {
+                const { eventName, data } = JSON.parse(msg.content.toString())
                 try {
-                    const { eventName, data } = JSON.parse(msg.content.toString())
+                    // const { eventName, data } = JSON.parse(msg.content.toString())
                     const eventHandlers = this.handlers(eventName)
                     if (eventHandlers.length === 0) throw new Error(`Not found handler for event. Event: "${eventName}"`)
                     await Promise.all(eventHandlers.map(handler => handler(this._adapter.toEvent(eventName, data))))
                 } catch (error) {
-                    console.log(`[EVENT BUS] - ${error.message}`)
+                    console.log(`[EVENT BUS] -> [${eventName}] - ${error.message}`)
                 }
             }
         }, { noAck: true });

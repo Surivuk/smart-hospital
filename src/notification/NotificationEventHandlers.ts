@@ -4,7 +4,7 @@ import { AlarmTriggered } from '@events/AlarmingEvents';
 
 export default class NotificationEventHandlers {
 
-    constructor(private readonly _socket: AppSocket) { }
+    constructor(private _socket: AppSocket) { }
 
     registerHandlers(eventBus: EventBus) {
         eventBus

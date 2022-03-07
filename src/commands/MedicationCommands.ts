@@ -9,6 +9,12 @@ export class CreateExamination implements ChainCommand {
 export class PrescribeTherapy implements ChainCommand {
     constructor(public readonly medicalCardId: Guid, public readonly therapyId: Guid, public readonly medicaments: MedicamentConsumption[]) { }
 }
+export class DetermineTherapy implements ChainCommand {
+    constructor(public readonly treatmentId: Guid, public readonly therapyId: Guid, public readonly medicaments: MedicamentConsumption[]) { }
+}
 export class OpenHospitalTreatment implements ChainCommand {
     constructor(public readonly medicalCardId: Guid, public readonly treatmentId: Guid) { }
 }
+// export class AddTherapyToTreatment implements ChainCommand {
+//     constructor(public readonly treatmentId: Guid, public readonly therapyId: Guid) { }
+// }

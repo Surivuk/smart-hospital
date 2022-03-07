@@ -3,13 +3,13 @@ import { AggregateRoot } from '@common/AggregateRoot';
 import EventStoreEvent from '@common/EventStoreEvent';
 import Guid from '@common/Guid';
 
-import { MedicationAddedToTherapy, MedicationRemovedFromTherapy, TherapyCreated } from './TherapyEvents';
+import { MedicamentAddedToTherapy, MedicamentRemovedFromTherapy, TherapyCreated } from './TherapyEvents';
 
-export class MedicationAlreadyIncludedInTherapy extends Error { }
+export class MedicamentAlreadyIncludedInTherapy extends Error { }
 
 export default class Therapy extends AggregateRoot {
 
-    private _medications: Map<string, MedicamentConsumption> = new Map();
+    private _medicaments: Map<string, MedicamentConsumption> = new Map();
 
     static create(id: Guid): Therapy {
         const therapy = new Therapy();
@@ -20,29 +20,32 @@ export default class Therapy extends AggregateRoot {
         this.applyChange(new TherapyCreated(id))
     }
 
-    addMedication(medication: MedicamentConsumption) {
-        if (this._medications.has(medication.medicamentId.toString()))
-            throw new MedicationAlreadyIncludedInTherapy(`Medication Id: "${medication.medicamentId.toString()}"`)
-        this.applyChange(new MedicationAddedToTherapy(this.id, medication))
+    addMedicament(medicament: MedicamentConsumption) {
+        if (this._medicaments.has(medicament.medicamentId.toString()))
+            throw new MedicamentAlreadyIncludedInTherapy(`Medicament Id: "${medicament.medicamentId.toString()}"`)
+        this.applyChange(new MedicamentAddedToTherapy(this.id, medicament))
     }
-    removeMedication(medicationId: Guid) {
-        if (this._medications.has(medicationId.toString()))
-            this.applyChange(new MedicationRemovedFromTherapy(this.id, medicationId))
+    addMedicaments(medicaments: MedicamentConsumption[]) {
+        medicaments.forEach(medicament => this.addMedicament(medicament))
+    }
+    removeMedicament(medicamentId: Guid) {
+        if (this._medicaments.has(medicamentId.toString()))
+            this.applyChange(new MedicamentRemovedFromTherapy(this.id, medicamentId))
     }
 
     protected apply(event: EventStoreEvent): void {
         if (event instanceof TherapyCreated) this.applyTherapyCreated(event)
-        if (event instanceof MedicationAddedToTherapy) this.applyMedicationAdded(event)
-        if (event instanceof MedicationRemovedFromTherapy) this.applyMedicationRemovedFromTherapy(event)
+        if (event instanceof MedicamentAddedToTherapy) this.applyMedicamentAdded(event)
+        if (event instanceof MedicamentRemovedFromTherapy) this.applyMedicamentRemovedFromTherapy(event)
     }
 
     private applyTherapyCreated(event: TherapyCreated) {
         this._id = event.therapyId;
     }
-    private applyMedicationAdded(event: MedicationAddedToTherapy) {
-        this._medications.set(event.medication.medicamentId.toString(), event.medication);
+    private applyMedicamentAdded(event: MedicamentAddedToTherapy) {
+        this._medicaments.set(event.medicament.medicamentId.toString(), event.medicament);
     }
-    private applyMedicationRemovedFromTherapy(event: MedicationRemovedFromTherapy) {
-        this._medications.delete(event.medicationId.toString());
+    private applyMedicamentRemovedFromTherapy(event: MedicamentRemovedFromTherapy) {
+        this._medicaments.delete(event.medicamentId.toString());
     }
 }

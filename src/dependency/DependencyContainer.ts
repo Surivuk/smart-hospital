@@ -5,9 +5,12 @@ import CommandChain from '@app/CommandChain';
 import EventBus from '@app/EventBus';
 import MqttConnection from '@common/mqtt/MqttConnection';
 import HealthDataQueryService from '@healthCenter/HealthDataQueryService';
+import HospitalTreatmentQueryService from '@medication/hospitalTreatment/HospitalTreatmentQueryService';
 import MedicalCardQueryService from '@medication/medicalCard/MedicalCardQueryService';
+import TherapyQueryService from '@medication/therapy/TherapyQueryService';
 
 export interface Dependency {
+
     mqtt: MqttConnection;
     commandChain: CommandChain;
     eventBus: EventBus;
@@ -18,6 +21,8 @@ export interface Dependency {
     medicalCardQueryService: MedicalCardQueryService;
     healthDataQueryService: HealthDataQueryService;
     alarmQueryService: AlarmQueryService;
+    therapyQueryService: TherapyQueryService;
+    hospitalTreatmentQueryService: HospitalTreatmentQueryService;
 }
 
 export default interface DependencyContainer {

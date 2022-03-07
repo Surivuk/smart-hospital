@@ -33,16 +33,20 @@ import DBHealthDataQueryService from '@healthCenter/persistance/DBHealthDataQuer
 import DBHealthDataRepository from '@healthCenter/persistance/DBHealthDataRepository';
 import ESExaminationRepository from '@medication/examination/persistance/ESExaminationRepository';
 import { ExaminationEventStore } from '@medication/examination/persistance/ExaminationEventStore';
+import DBHospitalTreatmentQueryService from '@medication/hospitalTreatment/persistance/DBHospitalTreatmentQueryService';
 import ESHospitalTreatmentRepository from '@medication/hospitalTreatment/persistance/ESHospitalTreatmentRepository';
 import { HospitalTreatmentEventStore } from '@medication/hospitalTreatment/persistance/HospitalTreatmentEventStore';
+import HospitalTreatmentReadWorker from '@medication/hospitalTreatment/persistance/HospitalTreatmentReadWorker';
 import DBMedicalCardQueryService from '@medication/medicalCard/persistance/DBMedicalCardQueryService';
 import ESMedicalCardRepository from '@medication/medicalCard/persistance/ESMedicalCardRepository';
 import { MedicalCardEventStore } from '@medication/medicalCard/persistance/MedicalCardEventStore';
 import MedicalCardReadWorker from '@medication/medicalCard/persistance/MedicalCardReadWorker';
 import MedicationEventHandler from '@medication/MedicationEventHandlers';
 import MedicationProcessor from '@medication/MedicationProcessor';
+import DBTherapyQueryService from '@medication/therapy/persistance/DBTherapyQueryService';
 import ESTherapyRepository from '@medication/therapy/persistance/ESTherapyRepository';
 import { TherapyEventStore } from '@medication/therapy/persistance/TherapyEventStore';
+import TherapyReadWorker from '@medication/therapy/persistance/TherapyReadWorker';
 import MonitoringEventHandlers from '@monitoring/MonitoringEventHandlers';
 import MonitoringProcessor from '@monitoring/MonitoringProcessor';
 import DBMonitoringRepository from '@monitoring/persistance/DBMonitoringRepository';
@@ -75,12 +79,31 @@ export default class AppDependencyContainer implements DependencyContainer {
     private _readWorkers: ReadWorker[] = []
 
     private _webSocket!: AppSocket;
+    private _httpServer!: HttpApi;
 
     constructor(private readonly _config: any) { }
 
     async createDependency(): Promise<this> {
         await this.createChannels();
         const client = EventStoreDBClient.connectionString("esdb://127.0.0.1:2113?tls=false")
+
+        this._dependency = {
+            mqtt: this._mqtt,
+            commandChain: this._commandChain,
+            eventBus: this._eventBus,
+
+            // QueryServices
+            patientQueryService: new MockPatientQueryService(),
+            doctorQueryService: new MockDoctorQueryService(),
+            medicalCardQueryService: new DBMedicalCardQueryService(),
+            healthDataQueryService: new DBHealthDataQueryService(),
+            alarmQueryService: new DBAlarmQueryService(),
+            therapyQueryService: new DBTherapyQueryService(),
+            hospitalTreatmentQueryService: new DBHospitalTreatmentQueryService()
+        }
+
+        this._httpServer = new HttpApi(this._dependency)
+        this._webSocket = new AppSocket(this._httpServer.io);
 
         // Repositories
         const patientRepository = new MockPatientRepository()
@@ -117,19 +140,10 @@ export default class AppDependencyContainer implements DependencyContainer {
 
         // ReadWorkers
         this._readWorkers.push(new MedicalCardReadWorker(client, new MedicalCardEventStore()))
+        this._readWorkers.push(new HospitalTreatmentReadWorker(client))
+        this._readWorkers.push(new TherapyReadWorker(client))
 
-        this._dependency = {
-            mqtt: this._mqtt,
-            commandChain: this._commandChain,
-            eventBus: this._eventBus,
 
-            // QueryServices
-            patientQueryService: new MockPatientQueryService(),
-            doctorQueryService: new MockDoctorQueryService(),
-            medicalCardQueryService: new DBMedicalCardQueryService(),
-            healthDataQueryService: new DBHealthDataQueryService(),
-            alarmQueryService: new DBAlarmQueryService()
-        }
         return this;
     }
 
@@ -167,9 +181,7 @@ export default class AppDependencyContainer implements DependencyContainer {
         return this;
     }
     startHttpApi(): this {
-        const httpApi = new HttpApi(this._dependency)
-        this._webSocket = new AppSocket(httpApi.io);
-        httpApi.start(this._config.port)
+        this._httpServer.start(this._config.port)
         return this;
     }
     startReadWorkers(): this {

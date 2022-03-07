@@ -13,18 +13,18 @@ export default class TherapyProcessors {
         return chain
             .registerProcessor<CreateTherapy>(CreateTherapy.name, async (command) => {
                 const therapy = Therapy.create(GuidFactory.guid())
-                command.medications.forEach(medication => therapy.addMedication(medication));
+                command.medications.forEach(medication => therapy.addMedicament(medication));
                 await this._repository.save(therapy)
                 this._eventBus.emit(new TherapyCreated(therapy.id, command.therapyId))
             })
             .registerProcessor<AddMedicationToTherapy>(AddMedicationToTherapy.name, async (command) => {
                 const therapy = await this._repository.therapy(command.therapyId)
-                therapy.addMedication(command.medication)
+                therapy.addMedicament(command.medication)
                 await this._repository.save(therapy)
             })
             .registerProcessor<RemoveMedicationFromTherapy>(RemoveMedicationFromTherapy.name, async (command) => {
                 const therapy = await this._repository.therapy(command.therapyId)
-                therapy.removeMedication(command.medicationId)
+                therapy.removeMedicament(command.medicationId)
                 await this._repository.save(therapy)
             })
     }

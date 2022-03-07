@@ -7,7 +7,7 @@ import AddPatient from "@app/commands/AdministrationCommands";
 import Name from "@adminstration/Name";
 import Gender from "@adminstration/Gender";
 import NormalNumberField from "@common/fields/NormalNumberField";
-import { CreateExamination, OpenHospitalTreatment, PrescribeTherapy } from "@app/commands/MedicationCommands";
+import { CreateExamination, DetermineTherapy, OpenHospitalTreatment, PrescribeTherapy } from "@app/commands/MedicationCommands";
 import MedicamentConsumption from "@medication/medicamentConsumption/MedicamentConsumption";
 import ConsumptionRoute from "@medication/medicamentConsumption/ConsumptionRoute";
 import ConsumptionFrequency from "@medication/medicamentConsumption/ConsumptionFrequency";
@@ -58,6 +58,17 @@ export default class CommandAdapter {
                 frequency: frequency.toString()
             }))
         }),
+        [DetermineTherapy.name]: ({ treatmentId, therapyId, medicaments }: DetermineTherapy) => ({
+            treatmentId: treatmentId.toString(),
+            therapyId: therapyId.toString(),
+            medicaments: medicaments.map(({ medicamentId, strength, amount, route, frequency }) => ({
+                medicamentId: medicamentId.toString(),
+                strength: strength.valueOf(),
+                amount: amount.valueOf(),
+                route: route.toString(),
+                frequency: frequency.toString()
+            }))
+        }),
         [OpenHospitalTreatment.name]: ({ medicalCardId, treatmentId }: OpenHospitalTreatment) => ({ medicalCardId: medicalCardId.toString(), treatmentId: treatmentId.toString() }),
         [ProcessHealthData.name]: ({ monitoringId, data }: ProcessHealthData) => ({ monitoringId: monitoringId.toString(), data }),
         [CreateAlarm.name]: ({ doctorId, alarm }: CreateAlarm) => ({ doctorId: doctorId.toString(), ...alarm.dto() }),
@@ -72,6 +83,10 @@ export default class CommandAdapter {
             new CreateExamination(new Guid(medicalCardId), new Guid(examinationId), new Guid(doctorId), NotEmptyStringField.create(diagnose)),
         [PrescribeTherapy.name]: ({ medicalCardId, therapyId, medicaments }) =>
             new PrescribeTherapy(new Guid(medicalCardId), new Guid(therapyId), medicaments.map(({ medicamentId, strength, amount, route, frequency }: any) =>
+                new MedicamentConsumption(new Guid(medicamentId), strength, amount, ConsumptionRoute.create(route), ConsumptionFrequency.create(frequency)))
+            ),
+        [DetermineTherapy.name]: ({ treatmentId, therapyId, medicaments }) =>
+            new DetermineTherapy(new Guid(treatmentId), new Guid(therapyId), medicaments.map(({ medicamentId, strength, amount, route, frequency }: any) =>
                 new MedicamentConsumption(new Guid(medicamentId), strength, amount, ConsumptionRoute.create(route), ConsumptionFrequency.create(frequency)))
             ),
         [OpenHospitalTreatment.name]: ({ medicalCardId, treatmentId }) => new OpenHospitalTreatment(new Guid(medicalCardId), new Guid(treatmentId)),

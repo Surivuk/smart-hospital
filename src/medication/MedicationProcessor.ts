@@ -1,6 +1,7 @@
 import CommandChain from "@app/CommandChain";
-import { CreateExamination, OpenHospitalTreatment, PrescribeTherapy } from "@app/commands/MedicationCommands";
+import { CreateExamination, DetermineTherapy, OpenHospitalTreatment, PrescribeTherapy } from "@app/commands/MedicationCommands";
 import EventBus from "@app/EventBus"
+import Guid from "@common/Guid";
 import { HospitalTreatmentOpened } from "@events/MedicationEvents";
 import Examination from "./examination/Examination";
 import ExaminationRepository from "./examination/ExaminationRepository";
@@ -31,7 +32,7 @@ export default class MedicationProcessor {
             .registerProcessor<PrescribeTherapy>(PrescribeTherapy.name, async ({ medicalCardId, therapyId, medicaments }) => {
                 const medicalCard = await this._medicalCardRepository.medicalCard(medicalCardId);
                 const therapy = Therapy.create(therapyId);
-                medicaments.forEach(medicament => therapy.addMedication(medicament))
+                therapy.addMedicaments(medicaments)
                 await this._therapyRepository.save(therapy)
                 medicalCard.noteTherapy(therapyId)
                 await this._medicalCardRepository.save(medicalCard);
@@ -42,6 +43,14 @@ export default class MedicationProcessor {
                 medicalCard.noteHospitalTreatment(treatmentId)
                 await this._medicalCardRepository.save(medicalCard);
                 this._eventBus.emit(new HospitalTreatmentOpened(treatmentId))
+            })
+            .registerProcessor<DetermineTherapy>(DetermineTherapy.name, async ({ treatmentId, therapyId, medicaments }) => {
+                const treatment = await this._treatmentRepository.treatment(treatmentId);
+                const therapy = Therapy.create(therapyId);
+                therapy.addMedicaments(medicaments)
+                await this._therapyRepository.save(therapy)
+                treatment.addTherapy(therapyId)
+                await this._treatmentRepository.save(treatment);
             })
     }
 }
