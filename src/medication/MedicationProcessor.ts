@@ -1,6 +1,7 @@
 import CommandChain from "@app/CommandChain";
-import { CreateExamination, DetermineTherapy, OpenHospitalTreatment, PrescribeTherapy } from "@app/commands/MedicationCommands";
+import { AddMedicamentToTherapy, CreateExamination, DetermineTherapy, OpenHospitalTreatment, PrescribeTherapy, RemoveMedicamentFromTherapy } from "@app/commands/MedicationCommands";
 import EventBus from "@app/EventBus"
+import NormalStringField from "@common/fields/NormalStringField";
 import Guid from "@common/Guid";
 import { HospitalTreatmentOpened } from "@events/MedicationEvents";
 import Examination from "./examination/Examination";
@@ -31,7 +32,7 @@ export default class MedicationProcessor {
             })
             .registerProcessor<PrescribeTherapy>(PrescribeTherapy.name, async ({ medicalCardId, therapyId, medicaments }) => {
                 const medicalCard = await this._medicalCardRepository.medicalCard(medicalCardId);
-                const therapy = Therapy.create(therapyId);
+                const therapy = Therapy.create(therapyId, NormalStringField.create(""));
                 therapy.addMedicaments(medicaments)
                 await this._therapyRepository.save(therapy)
                 medicalCard.noteTherapy(therapyId)
@@ -44,13 +45,23 @@ export default class MedicationProcessor {
                 await this._medicalCardRepository.save(medicalCard);
                 this._eventBus.emit(new HospitalTreatmentOpened(treatmentId))
             })
-            .registerProcessor<DetermineTherapy>(DetermineTherapy.name, async ({ treatmentId, therapyId, medicaments }) => {
+            .registerProcessor<DetermineTherapy>(DetermineTherapy.name, async ({ treatmentId, therapyId, treatmentLabel, medicaments }) => {
                 const treatment = await this._treatmentRepository.treatment(treatmentId);
-                const therapy = Therapy.create(therapyId);
+                const therapy = Therapy.create(therapyId, treatmentLabel);
                 therapy.addMedicaments(medicaments)
                 await this._therapyRepository.save(therapy)
                 treatment.addTherapy(therapyId)
                 await this._treatmentRepository.save(treatment);
+            })
+            .registerProcessor<AddMedicamentToTherapy>(AddMedicamentToTherapy.name, async ({ therapyId, medicament }) => {
+                const therapy = await this._therapyRepository.therapy(therapyId);
+                therapy.addMedicament(medicament)
+                await this._therapyRepository.save(therapy)
+            })
+            .registerProcessor<RemoveMedicamentFromTherapy>(RemoveMedicamentFromTherapy.name, async ({ therapyId, medicamentId }) => {
+                const therapy = await this._therapyRepository.therapy(therapyId);
+                therapy.removeMedicament(medicamentId)
+                await this._therapyRepository.save(therapy)
             })
     }
 }

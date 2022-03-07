@@ -1,17 +1,19 @@
-import EventStoreEvent from "@common/EventStoreEvent";
-import Guid from "@common/Guid";
-import { EventData, JSONEventType, jsonEvent } from "@eventstore/db-client";
-import ConsumptionFrequency from "@medication/medicamentConsumption/ConsumptionFrequency";
-import ConsumptionRoute from "@medication/medicamentConsumption/ConsumptionRoute";
-import MedicamentConsumption from "@medication/medicamentConsumption/MedicamentConsumption";
-import { MedicamentAddedToTherapy, MedicamentRemovedFromTherapy, TherapyCreated } from "../TherapyEvents";
+import EventStoreEvent from '@common/EventStoreEvent';
+import NormalStringField from '@common/fields/NormalStringField';
+import Guid from '@common/Guid';
+import { EventData, jsonEvent, JSONEventType } from '@eventstore/db-client';
+import ConsumptionFrequency from '@medication/medicamentConsumption/ConsumptionFrequency';
+import ConsumptionRoute from '@medication/medicamentConsumption/ConsumptionRoute';
+import MedicamentConsumption from '@medication/medicamentConsumption/MedicamentConsumption';
+
+import { MedicamentAddedToTherapy, MedicamentRemovedFromTherapy, TherapyCreated } from '../TherapyEvents';
 
 interface EventStoreAdapter<E extends EventStoreEvent, D extends TherapyEvents> {
     eventData(event: E): EventData
     event(event: D["data"]): E
 }
 
-type TherapyCreatedEvent = JSONEventType<"therapy-created", { therapyId: string }>;
+type TherapyCreatedEvent = JSONEventType<"therapy-created", { therapyId: string, label: string }>;
 type medicamentAddedToTherapyEvent = JSONEventType<"medicament-added-to-therapy", {
     therapyId: string;
     medicamentId: string;
@@ -42,8 +44,8 @@ export class TherapyEventStore {
 
     private get therapyCreated(): EventStoreAdapter<TherapyCreated, TherapyCreatedEvent> {
         return {
-            eventData: (event) => jsonEvent({ type: "therapy-created", data: { therapyId: event.therapyId.toString() } }),
-            event: (data) => new TherapyCreated(new Guid(data.therapyId))
+            eventData: (event) => jsonEvent({ type: "therapy-created", data: { therapyId: event.therapyId.toString(), label: event.label.toString() } }),
+            event: (data) => new TherapyCreated(new Guid(data.therapyId), NormalStringField.create(data.label))
         }
     }
     private get medicamentAddedToTherapy(): EventStoreAdapter<MedicamentAddedToTherapy, medicamentAddedToTherapyEvent> {
@@ -60,7 +62,7 @@ export class TherapyEventStore {
                 }
             }),
             event: (data) => new MedicamentAddedToTherapy(new Guid(data.therapyId), new MedicamentConsumption(
-                new Guid(data.therapyId),
+                new Guid(data.medicamentId),
                 data.strength,
                 data.amount,
                 ConsumptionRoute.create(data.route),

@@ -64,7 +64,7 @@ export default class TherapyReadWorker extends KnexConnector implements ReadWork
 
     }
     private async therapyCreated(id: string, data: any) {
-        return this.knex("therapy").insert({ id: id, created_at: this.knex.fn.now() })
+        return this.knex("therapy").insert({ id: id, label: data.label, created_at: this.knex.fn.now() })
     }
     private async medicamentAdded(id: string, data: any) {
         return this.knex("therapy_medicaments").insert({
@@ -78,6 +78,6 @@ export default class TherapyReadWorker extends KnexConnector implements ReadWork
         })
     }
     private async medicamentRemoved(id: string, data: any) {
-        return this.knex("therapy_medicaments").where({ therapy: id, medicament_id: data.medicationId }).delete()
+        return this.knex("therapy_medicaments").where({ therapy: id, medicament_id: data.medicamentId }).delete()
     }
 }

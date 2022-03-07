@@ -7,7 +7,7 @@ import AddPatient from "@app/commands/AdministrationCommands";
 import Name from "@adminstration/Name";
 import Gender from "@adminstration/Gender";
 import NormalNumberField from "@common/fields/NormalNumberField";
-import { CreateExamination, DetermineTherapy, OpenHospitalTreatment, PrescribeTherapy } from "@app/commands/MedicationCommands";
+import { AddMedicamentToTherapy, CreateExamination, DetermineTherapy, OpenHospitalTreatment, PrescribeTherapy, RemoveMedicamentFromTherapy } from "@app/commands/MedicationCommands";
 import MedicamentConsumption from "@medication/medicamentConsumption/MedicamentConsumption";
 import ConsumptionRoute from "@medication/medicamentConsumption/ConsumptionRoute";
 import ConsumptionFrequency from "@medication/medicamentConsumption/ConsumptionFrequency";
@@ -58,9 +58,10 @@ export default class CommandAdapter {
                 frequency: frequency.toString()
             }))
         }),
-        [DetermineTherapy.name]: ({ treatmentId, therapyId, medicaments }: DetermineTherapy) => ({
+        [DetermineTherapy.name]: ({ treatmentId, therapyId, treatmentLabel, medicaments }: DetermineTherapy) => ({
             treatmentId: treatmentId.toString(),
             therapyId: therapyId.toString(),
+            therapyLabel: treatmentLabel.toString(),
             medicaments: medicaments.map(({ medicamentId, strength, amount, route, frequency }) => ({
                 medicamentId: medicamentId.toString(),
                 strength: strength.valueOf(),
@@ -75,6 +76,17 @@ export default class CommandAdapter {
         [ActivateAlarm.name]: ({ alarmId }: ActivateAlarm) => ({ alarmId: alarmId.toString() }),
         [DeactivateAlarm.name]: ({ alarmId }: DeactivateAlarm) => ({ alarmId: alarmId.toString() }),
         [DeleteAlarm.name]: ({ alarmId }: DeleteAlarm) => ({ alarmId: alarmId.toString() }),
+        [AddMedicamentToTherapy.name]: ({ therapyId, medicament }: AddMedicamentToTherapy) => ({
+            therapyId: therapyId.toString(),
+            medicament: {
+                medicamentId: medicament.medicamentId.toString(),
+                strength: medicament.strength.valueOf(),
+                amount: medicament.amount.valueOf(),
+                route: medicament.route.toString(),
+                frequency: medicament.frequency.toString()
+            }
+        }),
+        [RemoveMedicamentFromTherapy.name]: ({ therapyId, medicamentId }: RemoveMedicamentFromTherapy) => ({ therapyId: therapyId.toString(), medicamentId: medicamentId.toString() }),
     }
     private readonly _deserializer: { [key: string]: CommandDeserializer<any> } = {
         [AddPatient.name]: ({ patientId, firstName, lastName, gender, birthYear }) =>
@@ -85,8 +97,8 @@ export default class CommandAdapter {
             new PrescribeTherapy(new Guid(medicalCardId), new Guid(therapyId), medicaments.map(({ medicamentId, strength, amount, route, frequency }: any) =>
                 new MedicamentConsumption(new Guid(medicamentId), strength, amount, ConsumptionRoute.create(route), ConsumptionFrequency.create(frequency)))
             ),
-        [DetermineTherapy.name]: ({ treatmentId, therapyId, medicaments }) =>
-            new DetermineTherapy(new Guid(treatmentId), new Guid(therapyId), medicaments.map(({ medicamentId, strength, amount, route, frequency }: any) =>
+        [DetermineTherapy.name]: ({ treatmentId, therapyId, therapyLabel, medicaments }) =>
+            new DetermineTherapy(new Guid(treatmentId), new Guid(therapyId), NotEmptyStringField.create(therapyLabel), medicaments.map(({ medicamentId, strength, amount, route, frequency }: any) =>
                 new MedicamentConsumption(new Guid(medicamentId), strength, amount, ConsumptionRoute.create(route), ConsumptionFrequency.create(frequency)))
             ),
         [OpenHospitalTreatment.name]: ({ medicalCardId, treatmentId }) => new OpenHospitalTreatment(new Guid(medicalCardId), new Guid(treatmentId)),
@@ -108,6 +120,16 @@ export default class CommandAdapter {
         [ActivateAlarm.name]: ({ alarmId }) => new ActivateAlarm(new Guid(alarmId)),
         [DeactivateAlarm.name]: ({ alarmId }) => new DeactivateAlarm(new Guid(alarmId)),
         [DeleteAlarm.name]: ({ alarmId }) => new DeleteAlarm(new Guid(alarmId)),
+        [AddMedicamentToTherapy.name]: ({ therapyId, medicament }) =>
+            new AddMedicamentToTherapy(new Guid(therapyId),
+                new MedicamentConsumption(
+                    new Guid(medicament.medicamentId),
+                    medicament.strength, medicament.amount,
+                    ConsumptionRoute.create(medicament.route),
+                    ConsumptionFrequency.create(medicament.frequency)
+                )
+            ),
+        [RemoveMedicamentFromTherapy.name]: ({ therapyId, medicamentId }) => new RemoveMedicamentFromTherapy(new Guid(therapyId), new Guid(medicamentId)),
     }
 
 

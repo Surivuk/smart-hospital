@@ -4,6 +4,7 @@ import EventStoreEvent from '@common/EventStoreEvent';
 import Guid from '@common/Guid';
 
 import { MedicamentAddedToTherapy, MedicamentRemovedFromTherapy, TherapyCreated } from './TherapyEvents';
+import StringField from '@common/fields/StringField';
 
 export class MedicamentAlreadyIncludedInTherapy extends Error { }
 
@@ -11,13 +12,13 @@ export default class Therapy extends AggregateRoot {
 
     private _medicaments: Map<string, MedicamentConsumption> = new Map();
 
-    static create(id: Guid): Therapy {
+    static create(id: Guid, label: StringField): Therapy {
         const therapy = new Therapy();
-        therapy.createTherapy(id)
+        therapy.createTherapy(id, label)
         return therapy;
     }
-    private createTherapy(id: Guid) {
-        this.applyChange(new TherapyCreated(id))
+    private createTherapy(id: Guid, label: StringField) {
+        this.applyChange(new TherapyCreated(id, label))
     }
 
     addMedicament(medicament: MedicamentConsumption) {

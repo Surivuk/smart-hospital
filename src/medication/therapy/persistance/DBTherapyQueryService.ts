@@ -32,6 +32,7 @@ export default class DBTherapyQueryService extends KnexConnector implements Ther
     private toTherapy(data: any, medications: any[]): TherapyReadModel {
         return {
             id: data.id,
+            label: data.label !== null ? data.label : "",
             medicaments: medications.map(medication => ({
                 medicamentId: medication.medicament_id,
                 strength: medication.strength,
