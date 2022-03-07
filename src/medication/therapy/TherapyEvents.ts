@@ -12,3 +12,6 @@ export class MedicamentAddedToTherapy implements EventStoreEvent {
 export class MedicamentRemovedFromTherapy implements EventStoreEvent {
     constructor(public readonly therapyId: Guid, public readonly medicamentId: Guid) { }
 }
+export class TherapyLabelChanged implements EventStoreEvent {
+    constructor(public readonly therapyId: Guid, public readonly label: StringField) { }
+}

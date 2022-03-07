@@ -30,7 +30,8 @@ export default class TherapyReadWorker extends KnexConnector implements ReadWork
                             prefixes: [
                                 "therapy-created",
                                 "medicament-added-to-therapy",
-                                "medicament-removed-from-therapy"
+                                "medicament-removed-from-therapy",
+                                "therapy-label-changed"
                             ]
                         })
                     }
@@ -58,6 +59,7 @@ export default class TherapyReadWorker extends KnexConnector implements ReadWork
             if (event.type === "therapy-created") await this.therapyCreated(id, event.data);
             if (event.type === "medicament-added-to-therapy") await this.medicamentAdded(id, event.data);
             if (event.type === "medicament-removed-from-therapy") await this.medicamentRemoved(id, event.data);
+            if (event.type === "therapy-label-changed") await this.labelChanged(id, event.data);
         } catch (error) {
             console.log(`[READ WORKER] - [MedicalCardReadWorker] - ${error.message}`)
         }
@@ -79,5 +81,8 @@ export default class TherapyReadWorker extends KnexConnector implements ReadWork
     }
     private async medicamentRemoved(id: string, data: any) {
         return this.knex("therapy_medicaments").where({ therapy: id, medicament_id: data.medicamentId }).delete()
+    }
+    private async labelChanged(id: string, data: any) {
+        return this.knex("therapy").update({ label: data.label }).where({ id: id })
     }
 }

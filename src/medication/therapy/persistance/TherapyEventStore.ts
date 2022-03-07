@@ -6,7 +6,7 @@ import ConsumptionFrequency from '@medication/medicamentConsumption/ConsumptionF
 import ConsumptionRoute from '@medication/medicamentConsumption/ConsumptionRoute';
 import MedicamentConsumption from '@medication/medicamentConsumption/MedicamentConsumption';
 
-import { MedicamentAddedToTherapy, MedicamentRemovedFromTherapy, TherapyCreated } from '../TherapyEvents';
+import { MedicamentAddedToTherapy, MedicamentRemovedFromTherapy, TherapyCreated, TherapyLabelChanged } from '../TherapyEvents';
 
 interface EventStoreAdapter<E extends EventStoreEvent, D extends TherapyEvents> {
     eventData(event: E): EventData
@@ -14,7 +14,7 @@ interface EventStoreAdapter<E extends EventStoreEvent, D extends TherapyEvents> 
 }
 
 type TherapyCreatedEvent = JSONEventType<"therapy-created", { therapyId: string, label: string }>;
-type medicamentAddedToTherapyEvent = JSONEventType<"medicament-added-to-therapy", {
+type MedicamentAddedToTherapyEvent = JSONEventType<"medicament-added-to-therapy", {
     therapyId: string;
     medicamentId: string;
     strength: number;
@@ -22,23 +22,31 @@ type medicamentAddedToTherapyEvent = JSONEventType<"medicament-added-to-therapy"
     route: string;
     frequency: string;
 }>;
-type medicamentRemovedFromTherapyEvent = JSONEventType<"medicament-removed-from-therapy", {
+type MedicamentRemovedFromTherapyEvent = JSONEventType<"medicament-removed-from-therapy", {
     therapyId: string;
     medicamentId: string;
 }>;
-export type TherapyEvents = TherapyCreatedEvent | medicamentAddedToTherapyEvent | medicamentRemovedFromTherapyEvent;
+type TherapyLabelChangedEvent = JSONEventType<"therapy-label-changed", {
+    therapyId: string;
+    label: string;
+}>;
+export type TherapyEvents = TherapyCreatedEvent | MedicamentAddedToTherapyEvent | MedicamentRemovedFromTherapyEvent | TherapyLabelChangedEvent;
 
 export class TherapyEventStore {
     eventData(event: EventStoreEvent): EventData {
         if (event instanceof TherapyCreated) return this.therapyCreated.eventData(event);
         if (event instanceof MedicamentAddedToTherapy) return this.medicamentAddedToTherapy.eventData(event);
         if (event instanceof MedicamentRemovedFromTherapy) return this.medicamentRemovedFromTherapy.eventData(event);
+        if (event instanceof TherapyLabelChanged) return this.therapyLabelChanged.eventData(event);
+
         throw new Error();
     }
     event(event: TherapyEvents): EventStoreEvent {
         if (event.type === "therapy-created") return this.therapyCreated.event(event.data);
         if (event.type === "medicament-added-to-therapy") return this.medicamentAddedToTherapy.event(event.data)
         if (event.type === "medicament-removed-from-therapy") return this.medicamentRemovedFromTherapy.event(event.data)
+        if (event.type === "therapy-label-changed") return this.therapyLabelChanged.event(event.data)
+
         throw new Error();
     }
 
@@ -48,7 +56,7 @@ export class TherapyEventStore {
             event: (data) => new TherapyCreated(new Guid(data.therapyId), NormalStringField.create(data.label))
         }
     }
-    private get medicamentAddedToTherapy(): EventStoreAdapter<MedicamentAddedToTherapy, medicamentAddedToTherapyEvent> {
+    private get medicamentAddedToTherapy(): EventStoreAdapter<MedicamentAddedToTherapy, MedicamentAddedToTherapyEvent> {
         return {
             eventData: (event) => jsonEvent({
                 type: "medicament-added-to-therapy",
@@ -70,7 +78,7 @@ export class TherapyEventStore {
             ))
         }
     }
-    private get medicamentRemovedFromTherapy(): EventStoreAdapter<MedicamentRemovedFromTherapy, medicamentRemovedFromTherapyEvent> {
+    private get medicamentRemovedFromTherapy(): EventStoreAdapter<MedicamentRemovedFromTherapy, MedicamentRemovedFromTherapyEvent> {
         return {
             eventData: (event) => jsonEvent({
                 type: "medicament-removed-from-therapy",
@@ -80,6 +88,18 @@ export class TherapyEventStore {
                 }
             }),
             event: (data) => new MedicamentRemovedFromTherapy(new Guid(data.therapyId), new Guid(data.medicamentId))
+        }
+    }
+    private get therapyLabelChanged(): EventStoreAdapter<TherapyLabelChanged, TherapyCreatedEvent> {
+        return {
+            eventData: (event) => jsonEvent({
+                type: "therapy-label-changed",
+                data: {
+                    therapyId: event.therapyId.toString(),
+                    label: event.label.toString(),
+                }
+            }),
+            event: (data) => new TherapyLabelChanged(new Guid(data.therapyId), NormalStringField.create(data.label))
         }
     }
 }

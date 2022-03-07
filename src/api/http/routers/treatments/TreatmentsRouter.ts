@@ -12,6 +12,7 @@ export default class TreatmentsRouter implements HttpRouter {
             .get("/", asyncHandler((req, res) => this._controller.treatments(req, res)))
             .get("/:id", asyncHandler((req, res) => this._controller.treatment(req, res)))
             .post("/", asyncHandler((req, res) => this._controller.openTreatment(req, res)))
+            .post("/:id/remove-therapy", asyncHandler((req, res) => this._controller.removeTherapy(req, res)))
     }
 
 }

@@ -1,5 +1,5 @@
 import CommandChain from "@app/CommandChain";
-import { AddMedicamentToTherapy, CreateExamination, DetermineTherapy, OpenHospitalTreatment, PrescribeTherapy, RemoveMedicamentFromTherapy } from "@app/commands/MedicationCommands";
+import { AddMedicamentToTherapy, ChangeTherapyLabel, CreateExamination, DetermineTherapy, OpenHospitalTreatment, PrescribeTherapy, RemoveMedicamentFromTherapy, RemoveTherapyFromTreatment } from "@app/commands/MedicationCommands";
 import EventBus from "@app/EventBus"
 import NormalStringField from "@common/fields/NormalStringField";
 import Guid from "@common/Guid";
@@ -62,6 +62,16 @@ export default class MedicationProcessor {
                 const therapy = await this._therapyRepository.therapy(therapyId);
                 therapy.removeMedicament(medicamentId)
                 await this._therapyRepository.save(therapy)
+            })
+            .registerProcessor<ChangeTherapyLabel>(ChangeTherapyLabel.name, async ({ therapyId, label }) => {
+                const therapy = await this._therapyRepository.therapy(therapyId);
+                therapy.changeLabel(label)
+                await this._therapyRepository.save(therapy)
+            })
+            .registerProcessor<RemoveTherapyFromTreatment>(RemoveTherapyFromTreatment.name, async ({ therapyId, treatmentId }) => {
+                const treatment = await this._treatmentRepository.treatment(treatmentId);
+                treatment.removeTherapy(therapyId)
+                await this._treatmentRepository.save(treatment)
             })
     }
 }

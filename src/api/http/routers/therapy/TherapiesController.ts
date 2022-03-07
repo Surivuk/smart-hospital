@@ -1,5 +1,6 @@
 import CommandChain from '@app/CommandChain';
-import { AddMedicamentToTherapy, DetermineTherapy, PrescribeTherapy, RemoveMedicamentFromTherapy } from '@app/commands/MedicationCommands';
+import { AddMedicamentToTherapy, ChangeTherapyLabel, DetermineTherapy, PrescribeTherapy, RemoveMedicamentFromTherapy } from '@app/commands/MedicationCommands';
+import NormalStringField from '@common/fields/NormalStringField';
 import NotEmptyStringField from '@common/fields/NotEmptyStringField';
 import Guid, { GuidFactory } from '@common/Guid';
 import ConsumptionFrequency from '@medication/medicamentConsumption/ConsumptionFrequency';
@@ -61,6 +62,14 @@ export default class TherapiesController {
         await this._commandChain.process(new RemoveMedicamentFromTherapy(
             Guid.create(req.params.id),
             Guid.create(medicamentId)
+        ))
+        res.sendStatus(204)
+    }
+    async changeTherapyLabel(req: Request, res: Response) {
+        const { label } = req.body
+        await this._commandChain.process(new ChangeTherapyLabel(
+            Guid.create(req.params.id),
+            NotEmptyStringField.create(label)
         ))
         res.sendStatus(204)
     }

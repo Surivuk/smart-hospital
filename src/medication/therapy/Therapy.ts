@@ -3,7 +3,7 @@ import { AggregateRoot } from '@common/AggregateRoot';
 import EventStoreEvent from '@common/EventStoreEvent';
 import Guid from '@common/Guid';
 
-import { MedicamentAddedToTherapy, MedicamentRemovedFromTherapy, TherapyCreated } from './TherapyEvents';
+import { MedicamentAddedToTherapy, MedicamentRemovedFromTherapy, TherapyCreated, TherapyLabelChanged } from './TherapyEvents';
 import StringField from '@common/fields/StringField';
 
 export class MedicamentAlreadyIncludedInTherapy extends Error { }
@@ -32,6 +32,9 @@ export default class Therapy extends AggregateRoot {
     removeMedicament(medicamentId: Guid) {
         if (this._medicaments.has(medicamentId.toString()))
             this.applyChange(new MedicamentRemovedFromTherapy(this.id, medicamentId))
+    }
+    changeLabel(newLabel: StringField) {
+        this.applyChange(new TherapyLabelChanged(this.id, newLabel))
     }
 
     protected apply(event: EventStoreEvent): void {

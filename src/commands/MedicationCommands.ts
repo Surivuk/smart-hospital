@@ -21,3 +21,9 @@ export class AddMedicamentToTherapy implements ChainCommand {
 export class RemoveMedicamentFromTherapy implements ChainCommand {
     constructor(public readonly therapyId: Guid, public readonly medicamentId: Guid) { }
 }
+export class ChangeTherapyLabel implements ChainCommand {
+    constructor(public readonly therapyId: Guid, public readonly label: StringField) { }
+}
+export class RemoveTherapyFromTreatment implements ChainCommand {
+    constructor(public readonly therapyId: Guid, public readonly treatmentId: Guid) { }
+}

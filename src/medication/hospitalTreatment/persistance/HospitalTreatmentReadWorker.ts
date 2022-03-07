@@ -29,7 +29,8 @@ export default class HospitalTreatmentReadWorker extends KnexConnector implement
                         filter: eventTypeFilter({
                             prefixes: [
                                 "hospital-treatment-created",
-                                "therapy-added-to-treatment"
+                                "therapy-added-to-treatment",
+                                "therapy-removed-from-treatment"
                             ]
                         })
                     }
@@ -56,6 +57,7 @@ export default class HospitalTreatmentReadWorker extends KnexConnector implement
             const id = event.streamId.split("hospital-treatment-")[1]
             if (event.type === "hospital-treatment-created") await this.treatmentCreated(id, event.data);
             if (event.type === "therapy-added-to-treatment") await this.therapyAdded(id, event.data);
+            if (event.type === "therapy-removed-from-treatment") await this.therapyRemoved(id, event.data);
         } catch (error) {
             console.log(`[READ WORKER] - [MedicalCardReadWorker] - ${error.message}`)
         }
@@ -66,5 +68,8 @@ export default class HospitalTreatmentReadWorker extends KnexConnector implement
     }
     private async therapyAdded(id: string, data: any) {
         return this.knex("hospital_treatment_therapies").insert({ therapy: data.therapyId, hospital_treatment: id, created_at: this.knex.fn.now() })
+    }
+    private async therapyRemoved(id: string, data: any) {
+        return this.knex("hospital_treatment_therapies").where({ therapy: data.therapyId, hospital_treatment: id }).delete()
     }
 }

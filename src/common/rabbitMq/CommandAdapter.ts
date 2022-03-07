@@ -7,7 +7,7 @@ import AddPatient from "@app/commands/AdministrationCommands";
 import Name from "@adminstration/Name";
 import Gender from "@adminstration/Gender";
 import NormalNumberField from "@common/fields/NormalNumberField";
-import { AddMedicamentToTherapy, CreateExamination, DetermineTherapy, OpenHospitalTreatment, PrescribeTherapy, RemoveMedicamentFromTherapy } from "@app/commands/MedicationCommands";
+import { AddMedicamentToTherapy, ChangeTherapyLabel, CreateExamination, DetermineTherapy, OpenHospitalTreatment, PrescribeTherapy, RemoveMedicamentFromTherapy, RemoveTherapyFromTreatment } from "@app/commands/MedicationCommands";
 import MedicamentConsumption from "@medication/medicamentConsumption/MedicamentConsumption";
 import ConsumptionRoute from "@medication/medicamentConsumption/ConsumptionRoute";
 import ConsumptionFrequency from "@medication/medicamentConsumption/ConsumptionFrequency";
@@ -17,6 +17,7 @@ import Alarm from "@app/alarming/alarm/Alarm";
 import AlarmOperator from "@app/alarming/alarm/AlarmOperator";
 import AlarmTrigger from "@app/alarming/alarm/AlarmTrigger";
 import TriggerOperation from "@app/alarming/alarm/TriggerOperation";
+import NormalStringField from "@common/fields/NormalStringField";
 
 interface CommandSerializer<T extends ChainCommand> {
     (event: T): any
@@ -87,6 +88,8 @@ export default class CommandAdapter {
             }
         }),
         [RemoveMedicamentFromTherapy.name]: ({ therapyId, medicamentId }: RemoveMedicamentFromTherapy) => ({ therapyId: therapyId.toString(), medicamentId: medicamentId.toString() }),
+        [ChangeTherapyLabel.name]: ({ therapyId, label }: ChangeTherapyLabel) => ({ therapyId: therapyId.toString(), label: label.toString() }),
+        [RemoveTherapyFromTreatment.name]: ({ therapyId, treatmentId }: RemoveTherapyFromTreatment) => ({ therapyId: therapyId.toString(), treatmentId: treatmentId.toString() }),
     }
     private readonly _deserializer: { [key: string]: CommandDeserializer<any> } = {
         [AddPatient.name]: ({ patientId, firstName, lastName, gender, birthYear }) =>
@@ -130,6 +133,8 @@ export default class CommandAdapter {
                 )
             ),
         [RemoveMedicamentFromTherapy.name]: ({ therapyId, medicamentId }) => new RemoveMedicamentFromTherapy(new Guid(therapyId), new Guid(medicamentId)),
+        [ChangeTherapyLabel.name]: ({ therapyId, label }) => new ChangeTherapyLabel(new Guid(therapyId), NormalStringField.create(label)),
+        [RemoveTherapyFromTreatment.name]: ({ therapyId, treatmentId }) => new RemoveTherapyFromTreatment(new Guid(therapyId), new Guid(treatmentId)),
     }
 
 
