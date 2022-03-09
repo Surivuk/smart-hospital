@@ -2,7 +2,7 @@ import Guid from "@common/Guid";
 
 export type HospitalTreatmentReadModel = {
     id: string;
-    therapies: { therapyId: string; createdAt: string }[]
+    therapies: { therapyId: string; label?: string, createdAt: string }[]
     createdAt: string
 }
 

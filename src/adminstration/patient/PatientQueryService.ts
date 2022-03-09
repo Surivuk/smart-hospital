@@ -1,3 +1,5 @@
+import Guid from "@common/Guid";
+
 export class PatientReadModel {
     constructor(
         public readonly id: string,
@@ -9,5 +11,6 @@ export class PatientReadModel {
 }
 
 export default interface PatientQueryService {
+    patient(id: Guid): Promise<PatientReadModel>;
     patients(): Promise<PatientReadModel[]>
 }

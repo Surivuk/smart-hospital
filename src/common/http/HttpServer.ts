@@ -17,7 +17,12 @@ export default abstract class HttpServer {
     constructor() {
         this._app = express()
         this._server = createServer(this._app)
-        this._io = new Server(this._server)
+        this._io = new Server(this._server, {
+            cors: {
+                origin: "http://localhost:3000",
+                methods: ["GET", "POST"]
+            }
+        })
     }
 
     get io() {

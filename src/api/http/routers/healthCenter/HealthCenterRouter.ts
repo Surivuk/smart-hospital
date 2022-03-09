@@ -1,4 +1,3 @@
-import DoctorsController from '@app/api/http/routers/doctors/DoctorsController';
 import HttpRouter from '@common/http/HttpRouter';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';

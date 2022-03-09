@@ -66,7 +66,7 @@ export default class TherapyReadWorker extends KnexConnector implements ReadWork
 
     }
     private async therapyCreated(id: string, data: any) {
-        return this.knex("therapy").insert({ id: id, label: data.label, created_at: this.knex.fn.now() })
+        return this.knex("therapy").insert({ id: id, label: data.label, type: data.type, created_at: this.knex.fn.now() })
     }
     private async medicamentAdded(id: string, data: any) {
         return this.knex("therapy_medicaments").insert({

@@ -33,7 +33,7 @@ export default class DBHospitalTreatmentQueryService extends KnexConnector imple
     private toTreatment(data: any, treatments: any[]): HospitalTreatmentReadModel {
         return {
             id: data.id,
-            therapies: treatments.map(t => ({ therapyId: t.therapy, createdAt: t.created_at })),
+            therapies: treatments.map(t => ({ therapyId: t.therapy, label: t.label !== null ? t.label : undefined, createdAt: t.created_at })),
             createdAt: data.created_at
         }
     }

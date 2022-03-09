@@ -3,7 +3,7 @@ import Name from "@adminstration/Name";
 import CommandChain from "@app/CommandChain";
 import AddPatient from "@app/commands/AdministrationCommands";
 import NormalNumberField from "@common/fields/NormalNumberField";
-import { GuidFactory } from "@common/Guid";
+import Guid, { GuidFactory } from "@common/Guid";
 import { Request, Response } from "express-serve-static-core";
 import PatientQueryService from "../../../../adminstration/patient/PatientQueryService";
 
@@ -16,6 +16,9 @@ export default class PatientsController {
 
     async patients(req: Request, res: Response) {
         res.json(await this._patientsQueryServer.patients())
+    }
+    async patient(req: Request, res: Response) {
+        res.json(await this._patientsQueryServer.patient(Guid.create(req.params.id)))
     }
     async addPatient(req: Request, res: Response) {
         const { firstName, lastName, gender, birthYear } = req.body

@@ -12,6 +12,7 @@ export default class PatientsRouter implements HttpRouter {
         return Router()
             .post("/", asyncHandler((req, res) => this._controller.addPatient(req, res)))
             .get("/", asyncHandler((req, res) => this._controller.patients(req, res)))
+            .get("/:id", asyncHandler((req, res) => this._controller.patient(req, res)))
     }
 
 }

@@ -33,6 +33,7 @@ export default class DBTherapyQueryService extends KnexConnector implements Ther
         return {
             id: data.id,
             label: data.label !== null ? data.label : "",
+            type: data.type,
             medicaments: medications.map(medication => ({
                 medicamentId: medication.medicament_id,
                 strength: medication.strength,

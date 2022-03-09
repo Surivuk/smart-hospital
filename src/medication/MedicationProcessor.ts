@@ -2,7 +2,6 @@ import CommandChain from "@app/CommandChain";
 import { AddMedicamentToTherapy, ChangeTherapyLabel, CreateExamination, DetermineTherapy, OpenHospitalTreatment, PrescribeTherapy, RemoveMedicamentFromTherapy, RemoveTherapyFromTreatment } from "@app/commands/MedicationCommands";
 import EventBus from "@app/EventBus"
 import NormalStringField from "@common/fields/NormalStringField";
-import Guid from "@common/Guid";
 import { HospitalTreatmentOpened } from "@events/MedicationEvents";
 import Examination from "./examination/Examination";
 import ExaminationRepository from "./examination/ExaminationRepository";
@@ -32,7 +31,7 @@ export default class MedicationProcessor {
             })
             .registerProcessor<PrescribeTherapy>(PrescribeTherapy.name, async ({ medicalCardId, therapyId, medicaments }) => {
                 const medicalCard = await this._medicalCardRepository.medicalCard(medicalCardId);
-                const therapy = Therapy.create(therapyId, NormalStringField.create(""));
+                const therapy = Therapy.createStaticTherapy(therapyId, NormalStringField.create(""));
                 therapy.addMedicaments(medicaments)
                 await this._therapyRepository.save(therapy)
                 medicalCard.noteTherapy(therapyId)
@@ -47,7 +46,7 @@ export default class MedicationProcessor {
             })
             .registerProcessor<DetermineTherapy>(DetermineTherapy.name, async ({ treatmentId, therapyId, treatmentLabel, medicaments }) => {
                 const treatment = await this._treatmentRepository.treatment(treatmentId);
-                const therapy = Therapy.create(therapyId, treatmentLabel);
+                const therapy = Therapy.createDynamicTherapy(therapyId, treatmentLabel);
                 therapy.addMedicaments(medicaments)
                 await this._therapyRepository.save(therapy)
                 treatment.addTherapy(therapyId)

@@ -3,6 +3,7 @@ import Guid from "@common/Guid";
 export type TherapyReadModel = {
     id: string;
     label: string,
+    type: string
     medicaments: {
         medicamentId: string;
         strength: string;

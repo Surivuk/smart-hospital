@@ -1,5 +1,7 @@
 import AdminstrationProcessor from '@adminstration/AdminstrationProcessor';
 import MockDoctorQueryService from '@adminstration/doctor/MockPatientQueryService';
+import DBPatientQueryService from '@adminstration/patient/DBPatientQueryService';
+import DBPatientRepository from '@adminstration/patient/DBPatientRepository';
 import MockPatientRepository from '@adminstration/patient/MockPatientRepository';
 import MockPatientQueryService from '@app/adminstration/patient/MockPatientQueryService';
 import AlarmingEventHandlers from '@app/alarming/AlarmingEventHandlers';
@@ -93,7 +95,7 @@ export default class AppDependencyContainer implements DependencyContainer {
             eventBus: this._eventBus,
 
             // QueryServices
-            patientQueryService: new MockPatientQueryService(),
+            patientQueryService: new DBPatientQueryService(),
             doctorQueryService: new MockDoctorQueryService(),
             medicalCardQueryService: new DBMedicalCardQueryService(),
             healthDataQueryService: new DBHealthDataQueryService(),
@@ -106,7 +108,7 @@ export default class AppDependencyContainer implements DependencyContainer {
         this._webSocket = new AppSocket(this._httpServer.io);
 
         // Repositories
-        const patientRepository = new MockPatientRepository()
+        const patientRepository = new DBPatientRepository()
         const medicalCardRepository = new ESMedicalCardRepository(client, new MedicalCardEventStore())
         const examinationRepository = new ESExaminationRepository(client, new ExaminationEventStore())
         const therapyRepository = new ESTherapyRepository(client, new TherapyEventStore())

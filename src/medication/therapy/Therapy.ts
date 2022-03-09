@@ -5,20 +5,28 @@ import Guid from '@common/Guid';
 
 import { MedicamentAddedToTherapy, MedicamentRemovedFromTherapy, TherapyCreated, TherapyLabelChanged } from './TherapyEvents';
 import StringField from '@common/fields/StringField';
+import TherapyType from './TherapyType';
+import TherapyContract from './TherapyContract';
 
 export class MedicamentAlreadyIncludedInTherapy extends Error { }
+export class StaticTherapyCannotChange extends Error { constructor() { super("Static therapy cannot be changed") } }
 
-export default class Therapy extends AggregateRoot {
+export default class Therapy extends AggregateRoot implements TherapyContract {
 
     private _medicaments: Map<string, MedicamentConsumption> = new Map();
 
-    static create(id: Guid, label: StringField): Therapy {
+    static createDynamicTherapy(id: Guid, label: StringField): Therapy {
         const therapy = new Therapy();
-        therapy.createTherapy(id, label)
+        therapy.createTherapy(id, label, TherapyType.dynamic())
         return therapy;
     }
-    private createTherapy(id: Guid, label: StringField) {
-        this.applyChange(new TherapyCreated(id, label))
+    static createStaticTherapy(id: Guid, label: StringField): Therapy {
+        const therapy = new Therapy();
+        therapy.createTherapy(id, label, TherapyType.static())
+        return therapy;
+    }
+    private createTherapy(id: Guid, label: StringField, type: TherapyType) {
+        this.applyChange(new TherapyCreated(id, label, type))
     }
 
     addMedicament(medicament: MedicamentConsumption) {
