@@ -15,7 +15,7 @@ export default class TherapyType {
     }
     static fromString(value: string): TherapyType {
         if (["dynamic", "static"].indexOf(value) === -1) throw new TherapyTypeError(`Provided string is not supported type. Type: "${value}"`)
-        return new TherapyType("static")
+        return new TherapyType(value)
     }
 
     isStatic() {

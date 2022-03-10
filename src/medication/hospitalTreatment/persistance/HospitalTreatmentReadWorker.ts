@@ -59,7 +59,7 @@ export default class HospitalTreatmentReadWorker extends KnexConnector implement
             if (event.type === "therapy-added-to-treatment") await this.therapyAdded(id, event.data);
             if (event.type === "therapy-removed-from-treatment") await this.therapyRemoved(id, event.data);
         } catch (error) {
-            console.log(`[READ WORKER] - [MedicalCardReadWorker] - ${error.message}`)
+            console.log(`[READ WORKER] - [HospitalTreatmentReadWorker] - ${error.message}`)
         }
 
     }

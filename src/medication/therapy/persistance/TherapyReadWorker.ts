@@ -83,6 +83,7 @@ export default class TherapyReadWorker extends KnexConnector implements ReadWork
         return this.knex("therapy_medicaments").where({ therapy: id, medicament_id: data.medicamentId }).delete()
     }
     private async labelChanged(id: string, data: any) {
+        await this.knex("hospital_treatment_therapies").update({ label: data.label }).where({ therapy: id })
         return this.knex("therapy").update({ label: data.label }).where({ id: id })
     }
 }
