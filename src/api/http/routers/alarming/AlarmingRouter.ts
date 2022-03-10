@@ -13,6 +13,7 @@ export default class AlarmingRouter implements HttpRouter {
             .post("/", asyncHandler((req, res) => this._controller.createAlarm(req, res)))
             .get("/", asyncHandler((req, res) => this._controller.alarms(req, res)))
             .get("/:id", asyncHandler((req, res) => this._controller.alarm(req, res)))
+            .get("/:id/notifications", asyncHandler((req, res) => this._controller.alarmNotifications(req, res)))
             .post("/:id/activate", asyncHandler((req, res) => this._controller.activateAlarm(req, res)))
             .post("/:id/deactivate", asyncHandler((req, res) => this._controller.deactivateAlarm(req, res)))
             .delete("/:id", asyncHandler((req, res) => this._controller.deleteAlarm(req, res)))

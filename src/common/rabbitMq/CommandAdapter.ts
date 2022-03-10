@@ -16,7 +16,7 @@ import { ActivateAlarm, CreateAlarm, DeactivateAlarm, DeleteAlarm } from "@app/c
 import Alarm from "@app/alarming/alarm/Alarm";
 import AlarmOperator from "@app/alarming/alarm/AlarmOperator";
 import AlarmTrigger from "@app/alarming/alarm/AlarmTrigger";
-import TriggerOperation from "@app/alarming/alarm/TriggerOperation";
+import TriggerOperator from "@app/alarming/alarm/TriggerOperation";
 import NormalStringField from "@common/fields/NormalStringField";
 
 interface CommandSerializer<T extends ChainCommand> {
@@ -107,17 +107,16 @@ export default class CommandAdapter {
             ),
         [OpenHospitalTreatment.name]: ({ medicalCardId, treatmentId }) => new OpenHospitalTreatment(new Guid(medicalCardId), new Guid(treatmentId)),
         [ProcessHealthData.name]: ({ monitoringId, data }) => new ProcessHealthData(new Guid(monitoringId), data),
-        [CreateAlarm.name]: ({ doctorId, treatmentId, id, operator, name, trigger }) => new CreateAlarm(
+        [CreateAlarm.name]: ({ doctorId, treatmentId, id, name, trigger }) => new CreateAlarm(
             Guid.create(doctorId),
             new Alarm(
-                id,
+                new Guid(id),
                 Guid.create(treatmentId),
-                AlarmOperator.create(operator),
                 NotEmptyStringField.create(name),
                 new AlarmTrigger(
                     NotEmptyStringField.create(trigger.key),
                     NotEmptyStringField.create(trigger.value),
-                    TriggerOperation.create(trigger.operator)
+                    TriggerOperator.create(trigger.operator)
                 )
             )
         ),

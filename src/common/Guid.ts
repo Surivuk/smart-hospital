@@ -7,7 +7,7 @@ export class GuidError extends Error {
 }
 
 export default class Guid {
-    constructor(private readonly value: string) { }
+    constructor(private readonly _value: string) { }
 
     static create(value: string, tag?: string): Guid {
         const printTag = () => tag ? ` Tag: "${tag}"` : "";
@@ -17,10 +17,10 @@ export default class Guid {
     }
 
     equals(obj: Guid): boolean {
-        return this.value === obj.value;
+        return this._value === obj._value;
     }
     toString() {
-        return this.value;
+        return this._value;
     }
 }
 

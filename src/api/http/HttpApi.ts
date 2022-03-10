@@ -38,6 +38,6 @@ export default class HttpApi extends HttpServer {
             .use("/therapies", new TherapiesRouter(new TherapiesController(this._dependency.commandChain, this._dependency.therapyQueryService)).router())
             .use("/hospital-treatments", new TreatmentsRouter(new TreatmentsController(this._dependency.commandChain, this._dependency.hospitalTreatmentQueryService)).router())
             .use("/health-center", new HealthCenterRouter(new HealthCenterController(this._dependency.healthDataQueryService)).router())
-            .use("/alarming", new AlarmingRouter(new AlarmingController(this._dependency.alarmQueryService, this._dependency.commandChain)).router())
+            .use("/alarming", new AlarmingRouter(new AlarmingController(this._dependency.alarmQueryService, this._dependency.alarmNotificationQueryService, this._dependency.commandChain)).router())
     }
 }

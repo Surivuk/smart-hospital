@@ -1,4 +1,5 @@
 import DoctorQueryService from '@adminstration/doctor/DoctorQueryService';
+import AlarmNotificationQueryService from '@alarming/alarmNotification/AlarmNotificationQueryService';
 import PatientQueryService from '@app/adminstration/patient/PatientQueryService';
 import AlarmQueryService from '@app/alarming/alarm/AlarmQueryService';
 import CommandChain from '@app/CommandChain';
@@ -23,6 +24,7 @@ export interface Dependency {
     alarmQueryService: AlarmQueryService;
     therapyQueryService: TherapyQueryService;
     hospitalTreatmentQueryService: HospitalTreatmentQueryService;
+    alarmNotificationQueryService: AlarmNotificationQueryService;
 }
 
 export default interface DependencyContainer {

@@ -6,7 +6,7 @@ import Alarm from "../alarm/Alarm";
 import AlarmOperator from "../alarm/AlarmOperator";
 import AlarmRepository from "../alarm/AlarmRepository";
 import AlarmTrigger from "../alarm/AlarmTrigger";
-import TriggerOperation from "../alarm/TriggerOperation";
+import TriggerOperator from "../alarm/TriggerOperation";
 
 export class DBAlarmRepositoryError extends Error {
     constructor(message: string) {
@@ -19,7 +19,7 @@ export default class DBAlarmRepository extends KnexConnector implements AlarmRep
         let trx!: Knex.Transaction
         try {
             trx = await this.knex.transaction()
-            const { id, name, operator, trigger, treatmentId } = alarm.dto()
+            const { id, name, trigger, treatmentId } = alarm.dto()
             await this.knex("alarm")
                 .transacting(trx)
                 .insert({
@@ -27,7 +27,6 @@ export default class DBAlarmRepository extends KnexConnector implements AlarmRep
                     doctor: doctorId.toString(),
                     hospital_treatment: treatmentId,
                     name,
-                    operator,
                     created_at: this.knex.fn.now()
                 })
             await this.knex("alarm_triggers")
@@ -91,12 +90,11 @@ export default class DBAlarmRepository extends KnexConnector implements AlarmRep
         return new Alarm(
             new Guid(alarm.id),
             new Guid(alarm.hospital_treatment),
-            AlarmOperator.create(alarm.operator),
             NotEmptyStringField.create(alarm.name),
             new AlarmTrigger(
                 NotEmptyStringField.create(trigger.key),
                 NotEmptyStringField.create(trigger.value),
-                TriggerOperation.create(trigger.operator)
+                TriggerOperator.create(trigger.operator)
             )
         )
     }

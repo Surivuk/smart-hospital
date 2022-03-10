@@ -11,7 +11,7 @@ export class DBAlarmQueryServiceError extends Error {
 export default class DBAlarmQueryService extends KnexConnector implements AlarmQueryService {
     async alarm(id: Guid): Promise<AlarmReadModel> {
         try {
-            const alarm = await this.knex("alarm").where({ id: id.toString() })
+            const alarm = await this.knex("alarm_view").where({ id: id.toString() })
             if (alarm.length === 0) throw new Error(`Not found alarm for provided id. Id: "${id.toString()}"`)
             const triggers = await this.knex("alarm_triggers").where({ alarm: alarm[0].id })
             return this.toAlarmReadModel(alarm[0], triggers)
@@ -21,7 +21,7 @@ export default class DBAlarmQueryService extends KnexConnector implements AlarmQ
     }
     async alarms(doctorId: Guid): Promise<AlarmReadModel[]> {
         try {
-            const alarms = await this.knex("alarm").where({ doctor: doctorId.toString() })
+            const alarms = await this.knex("alarm_view").where({ doctor: doctorId.toString() })
             const triggers = await this.knex("alarm_triggers").whereIn("alarm", alarms.map(row => row.id))
             return alarms.map(alarm => this.toAlarmReadModel(alarm, triggers))
         } catch (error) {
@@ -33,7 +33,9 @@ export default class DBAlarmQueryService extends KnexConnector implements AlarmQ
         const trigger = triggers.filter(trigger => trigger.alarm === alarm.id)[0]
         return {
             id: alarm.id,
-            operator: alarm.operator,
+            hospitalTreatment: alarm.hospital_treatment,
+            medicalCard: alarm.medical_card, 
+            name: alarm.name,
             trigger: {
                 key: trigger.key,
                 value: trigger.value,

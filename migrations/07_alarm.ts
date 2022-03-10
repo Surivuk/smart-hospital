@@ -5,7 +5,6 @@ export async function up(knex: Knex): Promise<void> {
         table.string("id").nullable().primary();
         table.string("doctor").nullable();
         table.string("hospital_treatment").nullable();
-        table.string("operator").nullable();
         table.string("name").nullable();
         table.boolean("active").nullable().defaultTo(true);
         table.timestamp("created_at").notNullable();

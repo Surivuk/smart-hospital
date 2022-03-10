@@ -47,6 +47,7 @@ export default class MemoryAlarmRepository implements AlarmRepository {
             this._cache.set(treatmentId, [alarm]);
     }
     private removeAlarm(id: Guid) {
+       
         this._cache.forEach((alarms) => {
             const index = alarms.findIndex(alarm => alarm.id.equals(id))
             if (index !== -1)

@@ -1,4 +1,5 @@
 import { Knex } from "knex";
+
 export async function up(knex: Knex): Promise<void> {
     return knex.schema.raw(`CREATE VIEW hospital_treatment_view AS 
         SELECT 

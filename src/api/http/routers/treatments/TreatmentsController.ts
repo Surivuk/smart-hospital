@@ -1,5 +1,5 @@
 import CommandChain from '@app/CommandChain';
-import {  CloseHospitalTreatment, OpenHospitalTreatment, RemoveTherapyFromTreatment } from '@app/commands/MedicationCommands';
+import { CloseHospitalTreatment, OpenHospitalTreatment, RemoveTherapyFromTreatment } from '@app/commands/MedicationCommands';
 import Guid, { GuidFactory } from '@common/Guid';
 import HospitalTreatmentQueryService from '@medication/hospitalTreatment/HospitalTreatmentQueryService';
 import { Request, Response } from 'express-serve-static-core';
@@ -31,6 +31,9 @@ export default class TreatmentsController {
         res.json(await this._query.treatment(Guid.create(req.params.id)))
     }
     async treatments(req: Request, res: Response) {
-        res.json(await this._query.treatments(Guid.create(req.query.medicalCardId as string)))
+        if (req.query.medicalCardId !== undefined)
+            res.json(await this._query.treatmentsForMedicalCard(Guid.create(req.query.medicalCardId as string)))
+        else
+            res.json(await this._query.treatments())
     }
 }

@@ -3,6 +3,7 @@ import MockDoctorQueryService from '@adminstration/doctor/MockPatientQueryServic
 import DBPatientQueryService from '@adminstration/patient/DBPatientQueryService';
 import DBPatientRepository from '@adminstration/patient/DBPatientRepository';
 import MockPatientRepository from '@adminstration/patient/MockPatientRepository';
+import DBAlarmNotificationQueryService from '@alarming/perstitance/DBAlarmNotificationQueryService';
 import MockPatientQueryService from '@app/adminstration/patient/MockPatientQueryService';
 import AlarmingEventHandlers from '@app/alarming/AlarmingEventHandlers';
 import AlarmingProcessor from '@app/alarming/AlarmingProcessor';
@@ -101,7 +102,8 @@ export default class AppDependencyContainer implements DependencyContainer {
             healthDataQueryService: new DBHealthDataQueryService(),
             alarmQueryService: new DBAlarmQueryService(),
             therapyQueryService: new DBTherapyQueryService(),
-            hospitalTreatmentQueryService: new DBHospitalTreatmentQueryService()
+            hospitalTreatmentQueryService: new DBHospitalTreatmentQueryService(),
+            alarmNotificationQueryService: new DBAlarmNotificationQueryService()
         }
 
         this._httpServer = new HttpApi(this._dependency)
@@ -138,7 +140,7 @@ export default class AppDependencyContainer implements DependencyContainer {
             temperature: (timestamp, value) => new Temperature(timestamp, parseInt(value)),
         }))
         this._alarmingEventHandlers = new AlarmingEventHandlers(alarmRepository, alarmNotificationRepository)
-        this._notificationEventHandlers = new NotificationEventHandlers(this._webSocket)
+        this._notificationEventHandlers = new NotificationEventHandlers(this._webSocket, this._dependency.alarmQueryService)
 
         // ReadWorkers
         this._readWorkers.push(new MedicalCardReadWorker(client, new MedicalCardEventStore()))

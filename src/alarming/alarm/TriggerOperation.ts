@@ -4,13 +4,13 @@ export class TriggerOperationError extends Error {
     }
 }
 
-export default class TriggerOperation {
-    constructor(private readonly _operation: "=" | "<" | ">") { }
+export default class TriggerOperator {
+    constructor(private readonly _operator: "=" | "<" | ">") { }
 
-    static create(operation: string): TriggerOperation {
+    static create(operation: string): TriggerOperator {
         if (["=", "<", ">"].indexOf(operation) === -1)
-            throw new TriggerOperationError(`Provided operation is not supported. Operation: "${operation}"`);
-        return new TriggerOperation(operation as "=" | "<" | ">")
+            throw new TriggerOperationError(`Provided operator is not supported. Operator: "${operation}"`);
+        return new TriggerOperator(operation as "=" | "<" | ">")
     }
 
     triggered(referentValue: string, arrivedValue: string): boolean {
@@ -34,12 +34,12 @@ export default class TriggerOperation {
         return parseFloat(value)
     }
     private check(a: any, b: any): boolean {
-        if(this._operation === "<") return b < a;
-        if(this._operation === ">") return b > a;
+        if(this._operator === "<") return b < a;
+        if(this._operator === ">") return b > a;
         return a === b;
     }
 
     toString() {
-        return this._operation;
+        return this._operator;
     }
 }
