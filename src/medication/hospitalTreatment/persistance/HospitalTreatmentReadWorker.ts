@@ -30,7 +30,8 @@ export default class HospitalTreatmentReadWorker extends KnexConnector implement
                             prefixes: [
                                 "hospital-treatment-created",
                                 "therapy-added-to-treatment",
-                                "therapy-removed-from-treatment"
+                                "therapy-removed-from-treatment",
+                                "hospital-treatment-closed"
                             ]
                         })
                     }
@@ -58,6 +59,7 @@ export default class HospitalTreatmentReadWorker extends KnexConnector implement
             if (event.type === "hospital-treatment-created") await this.treatmentCreated(id, event.data);
             if (event.type === "therapy-added-to-treatment") await this.therapyAdded(id, event.data);
             if (event.type === "therapy-removed-from-treatment") await this.therapyRemoved(id, event.data);
+            if (event.type === "hospital-treatment-closed") await this.treatmentClosed(id, event.data);
         } catch (error) {
             console.log(`[READ WORKER] - [HospitalTreatmentReadWorker] - ${error.message}`)
         }
@@ -67,10 +69,12 @@ export default class HospitalTreatmentReadWorker extends KnexConnector implement
         return this.knex("hospital_treatment").insert({ id: id, medical_card: data.medicalCardId, created_at: this.knex.fn.now() })
     }
     private async therapyAdded(id: string, data: any) {
-        const therapy = (await this.knex("therapy").where({ id: data.therapyId }))[0]
-        return this.knex("hospital_treatment_therapies").insert({ therapy: data.therapyId, label: therapy.label, hospital_treatment: id, created_at: this.knex.fn.now() })
+        return this.knex("hospital_treatment_therapies").insert({ therapy: data.therapyId, hospital_treatment: id, created_at: this.knex.fn.now() })
     }
     private async therapyRemoved(id: string, data: any) {
         return this.knex("hospital_treatment_therapies").where({ therapy: data.therapyId, hospital_treatment: id }).delete()
+    }
+    private async treatmentClosed(id: string, data: any) {
+        return this.knex("hospital_treatment").update({ closed: true, closed_at: this.knex.fn.now() }).where({ id: id })
     }
 }

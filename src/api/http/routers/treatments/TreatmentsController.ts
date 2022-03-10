@@ -1,5 +1,5 @@
 import CommandChain from '@app/CommandChain';
-import {  OpenHospitalTreatment, RemoveTherapyFromTreatment } from '@app/commands/MedicationCommands';
+import {  CloseHospitalTreatment, OpenHospitalTreatment, RemoveTherapyFromTreatment } from '@app/commands/MedicationCommands';
 import Guid, { GuidFactory } from '@common/Guid';
 import HospitalTreatmentQueryService from '@medication/hospitalTreatment/HospitalTreatmentQueryService';
 import { Request, Response } from 'express-serve-static-core';
@@ -17,6 +17,10 @@ export default class TreatmentsController {
         await this._commandChain.process(new OpenHospitalTreatment(Guid.create(medicalCardId), id))
         res.header("Location", `/treatments/${id.toString()}`)
         res.sendStatus(201)
+    }
+    async closeTreatment(req: Request, res: Response) {
+        await this._commandChain.process(new CloseHospitalTreatment(Guid.create(req.params.id)))
+        res.sendStatus(204)
     }
     async removeTherapy(req: Request, res: Response) {
         const { therapyId } = req.body

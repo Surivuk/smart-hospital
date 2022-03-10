@@ -1,7 +1,7 @@
 import { AggregateRoot } from "@common/AggregateRoot";
 import EventStoreEvent from "@common/EventStoreEvent";
 import Guid from "@common/Guid";
-import { HospitalTreatmentCreated, TherapyAddedToHospitalTreatment, TherapyRemovedFromHospitalTreatment } from "./HospitalTreatmentEvents";
+import { HospitalTreatmentClosed, HospitalTreatmentCreated, TherapyAddedToHospitalTreatment, TherapyRemovedFromHospitalTreatment } from "./HospitalTreatmentEvents";
 
 export class HospitalTreatmentError extends Error {
     constructor(message: string) {
@@ -12,6 +12,7 @@ export class HospitalTreatmentError extends Error {
 export default class HospitalTreatment extends AggregateRoot {
 
     private _therapies: Guid[] = [];
+    private _closed: boolean = false;
 
     static create(id: Guid, medicalCardId: Guid): HospitalTreatment {
         const result = new HospitalTreatment()
@@ -20,10 +21,16 @@ export default class HospitalTreatment extends AggregateRoot {
     }
 
     addTherapy(therapyId: Guid) {
+        if (this._closed) throw new Error("Hospital treatment is closed. Actions not allowed")
         this.applyChange(new TherapyAddedToHospitalTreatment(this.id, therapyId))
     }
     removeTherapy(therapyId: Guid) {
+        if (this._closed) throw new Error("Hospital treatment is closed. Actions not allowed")
         this.applyChange(new TherapyRemovedFromHospitalTreatment(this.id, therapyId))
+    }
+    closeTreatment() {
+        if (!this._closed)
+            this.applyChange(new HospitalTreatmentClosed(this.id))
     }
 
     private createHospitalTreatment(id: Guid, medicalCardId: Guid) {
@@ -42,6 +49,9 @@ export default class HospitalTreatment extends AggregateRoot {
             throw new HospitalTreatmentError(`Hospital treatment does not contain that therapy. Treatment: "${this._id.toString()}", Therapy: "${event.therapyId.toString()}"`)
         this._therapies = this._therapies.filter(therapy => !therapy.equals(event.therapyId));
     }
+    private applyHospitalTreatmentClosed(event: HospitalTreatmentClosed) {
+        this._closed = true;
+    }
     private hasTherapy(therapyId: Guid): boolean {
         return this._therapies.find(therapy => therapy.equals(therapyId)) !== undefined;
     }
@@ -50,5 +60,6 @@ export default class HospitalTreatment extends AggregateRoot {
         if (event instanceof HospitalTreatmentCreated) this.applyHospitalTreatmentCreated(event)
         if (event instanceof TherapyAddedToHospitalTreatment) this.applyTherapyAddedToHospitalTreatment(event);
         if (event instanceof TherapyRemovedFromHospitalTreatment) this.applyRemoveMedicationFromTherapy(event);
+        if (event instanceof HospitalTreatmentClosed) this.applyHospitalTreatmentClosed(event);
     }
 }

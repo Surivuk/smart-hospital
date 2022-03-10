@@ -11,9 +11,9 @@ export class DBHospitalTreatmentQueryServiceError extends Error {
 export default class DBHospitalTreatmentQueryService extends KnexConnector implements HospitalTreatmentQueryService {
     async treatment(id: Guid): Promise<HospitalTreatmentReadModel> {
         try {
-            const treatment = await this.knex("hospital_treatment").where({ id: id.toString() })
+            const treatment = await this.knex("hospital_treatment_view").where({ id: id.toString() })
             if (treatment.length === 0) throw new Error(`Not found treatment with provided id. Id: "${id.toString()}"`)
-            const therapies = await this.knex("hospital_treatment_therapies").where({ hospital_treatment: treatment[0].id })
+            const therapies = await this.knex("hospital_treatment_therapies_view").where({ hospital_treatment: treatment[0].id })
             return this.toTreatment(treatment[0], therapies)
         } catch (error) {
             throw new DBHospitalTreatmentQueryServiceError(`[treatment] - ${error.message}`);
@@ -22,8 +22,8 @@ export default class DBHospitalTreatmentQueryService extends KnexConnector imple
     }
     async treatments(medicalCardId: Guid): Promise<HospitalTreatmentReadModel[]> {
         try {
-            const treatments = await this.knex("hospital_treatment").where({ medical_card: medicalCardId.toString() })
-            const therapies = await this.knex("hospital_treatment_therapies").whereIn("hospital_treatment", treatments.map(t => t.id))
+            const treatments = await this.knex("hospital_treatment_view").where({ medical_card: medicalCardId.toString() })
+            const therapies = await this.knex("hospital_treatment_therapies_view").whereIn("hospital_treatment", treatments.map(t => t.id))
             return treatments.map(treatment => this.toTreatment(treatment, therapies.filter(t => t.hospital_treatment === treatment.id)))
         } catch (error) {
             throw new DBHospitalTreatmentQueryServiceError(`[treatments] - ${error.message}`);
@@ -33,8 +33,11 @@ export default class DBHospitalTreatmentQueryService extends KnexConnector imple
     private toTreatment(data: any, treatments: any[]): HospitalTreatmentReadModel {
         return {
             id: data.id,
+            patient: data.patient,
             therapies: treatments.map(t => ({ therapyId: t.therapy, label: t.label !== null ? t.label : undefined, createdAt: t.created_at })),
-            createdAt: data.created_at
+            closed: data.closed !== null ? data.closed : false,
+            createdAt: data.created_at,
+            closedAt: data.closed_at !== null ? data.closed_at : undefined
         }
     }
 }

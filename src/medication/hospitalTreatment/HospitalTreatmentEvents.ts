@@ -10,3 +10,6 @@ export class TherapyAddedToHospitalTreatment implements EventStoreEvent {
 export class TherapyRemovedFromHospitalTreatment implements EventStoreEvent {
     constructor(public readonly treatmentId: Guid, public readonly therapyId: Guid) { }
 }
+export class HospitalTreatmentClosed implements EventStoreEvent {
+    constructor(public readonly treatmentId: Guid) { }
+}

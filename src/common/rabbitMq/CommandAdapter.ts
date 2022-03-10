@@ -7,7 +7,7 @@ import AddPatient from "@app/commands/AdministrationCommands";
 import Name from "@adminstration/Name";
 import Gender from "@adminstration/Gender";
 import NormalNumberField from "@common/fields/NormalNumberField";
-import { AddMedicamentToTherapy, ChangeTherapyLabel, CreateExamination, DetermineTherapy, OpenHospitalTreatment, PrescribeTherapy, RemoveMedicamentFromTherapy, RemoveTherapyFromTreatment } from "@app/commands/MedicationCommands";
+import { AddMedicamentToTherapy, ChangeTherapyLabel, CloseHospitalTreatment, CreateExamination, DetermineTherapy, OpenHospitalTreatment, PrescribeTherapy, RemoveMedicamentFromTherapy, RemoveTherapyFromTreatment } from "@app/commands/MedicationCommands";
 import MedicamentConsumption from "@medication/medicamentConsumption/MedicamentConsumption";
 import ConsumptionRoute from "@medication/medicamentConsumption/ConsumptionRoute";
 import ConsumptionFrequency from "@medication/medicamentConsumption/ConsumptionFrequency";
@@ -90,6 +90,7 @@ export default class CommandAdapter {
         [RemoveMedicamentFromTherapy.name]: ({ therapyId, medicamentId }: RemoveMedicamentFromTherapy) => ({ therapyId: therapyId.toString(), medicamentId: medicamentId.toString() }),
         [ChangeTherapyLabel.name]: ({ therapyId, label }: ChangeTherapyLabel) => ({ therapyId: therapyId.toString(), label: label.toString() }),
         [RemoveTherapyFromTreatment.name]: ({ therapyId, treatmentId }: RemoveTherapyFromTreatment) => ({ therapyId: therapyId.toString(), treatmentId: treatmentId.toString() }),
+        [CloseHospitalTreatment.name]: ({ treatmentId }: CloseHospitalTreatment) => ({ treatmentId: treatmentId.toString() }),
     }
     private readonly _deserializer: { [key: string]: CommandDeserializer<any> } = {
         [AddPatient.name]: ({ patientId, firstName, lastName, gender, birthYear }) =>
@@ -135,6 +136,7 @@ export default class CommandAdapter {
         [RemoveMedicamentFromTherapy.name]: ({ therapyId, medicamentId }) => new RemoveMedicamentFromTherapy(new Guid(therapyId), new Guid(medicamentId)),
         [ChangeTherapyLabel.name]: ({ therapyId, label }) => new ChangeTherapyLabel(new Guid(therapyId), NormalStringField.create(label)),
         [RemoveTherapyFromTreatment.name]: ({ therapyId, treatmentId }) => new RemoveTherapyFromTreatment(new Guid(therapyId), new Guid(treatmentId)),
+        [CloseHospitalTreatment.name]: ({ treatmentId }) => new CloseHospitalTreatment(new Guid(treatmentId)),
     }
 
 

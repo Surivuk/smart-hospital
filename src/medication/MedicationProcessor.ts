@@ -1,8 +1,8 @@
 import CommandChain from "@app/CommandChain";
-import { AddMedicamentToTherapy, ChangeTherapyLabel, CreateExamination, DetermineTherapy, OpenHospitalTreatment, PrescribeTherapy, RemoveMedicamentFromTherapy, RemoveTherapyFromTreatment } from "@app/commands/MedicationCommands";
+import { AddMedicamentToTherapy, ChangeTherapyLabel, CloseHospitalTreatment, CreateExamination, DetermineTherapy, OpenHospitalTreatment, PrescribeTherapy, RemoveMedicamentFromTherapy, RemoveTherapyFromTreatment } from "@app/commands/MedicationCommands";
 import EventBus from "@app/EventBus"
 import NormalStringField from "@common/fields/NormalStringField";
-import { HospitalTreatmentOpened } from "@events/MedicationEvents";
+import { HospitalTreatmentClosed, HospitalTreatmentOpened } from "@events/MedicationEvents";
 import Examination from "./examination/Examination";
 import ExaminationRepository from "./examination/ExaminationRepository";
 import HospitalTreatment from "./hospitalTreatment/HospitalTreatment";
@@ -71,6 +71,12 @@ export default class MedicationProcessor {
                 const treatment = await this._treatmentRepository.treatment(treatmentId);
                 treatment.removeTherapy(therapyId)
                 await this._treatmentRepository.save(treatment)
+            })
+            .registerProcessor<CloseHospitalTreatment>(CloseHospitalTreatment.name, async ({ treatmentId }) => {
+                const treatment = await this._treatmentRepository.treatment(treatmentId);
+                treatment.closeTreatment()
+                await this._treatmentRepository.save(treatment)
+                this._eventBus.emit(new HospitalTreatmentClosed(treatmentId))
             })
     }
 }

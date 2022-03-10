@@ -18,6 +18,7 @@ export default class MedicalCardReadWorker extends KnexConnector implements Read
     async work(): Promise<void> {
         try {
             try {
+                // await this._client.deletePersistentSubscriptionToAll(this._groupName)
                 await this._client.getPersistentSubscriptionToAllInfo(this._groupName)
             } catch (error) {
                 await this._client.createPersistentSubscriptionToAll(this._groupName,

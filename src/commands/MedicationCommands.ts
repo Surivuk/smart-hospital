@@ -27,3 +27,6 @@ export class ChangeTherapyLabel implements ChainCommand {
 export class RemoveTherapyFromTreatment implements ChainCommand {
     constructor(public readonly therapyId: Guid, public readonly treatmentId: Guid) { }
 }
+export class CloseHospitalTreatment implements ChainCommand {
+    constructor(public readonly treatmentId: Guid) { }
+}

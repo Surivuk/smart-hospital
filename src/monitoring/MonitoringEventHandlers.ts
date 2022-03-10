@@ -1,5 +1,5 @@
 import EventBus from "@app/EventBus";
-import { HospitalTreatmentOpened } from "@events/MedicationEvents";
+import { HospitalTreatmentClosed, HospitalTreatmentOpened } from "@events/MedicationEvents";
 import MonitoringRepository from "./MonitoringRepository";
 
 export default class MonitoringEventHandlers {
@@ -13,6 +13,13 @@ export default class MonitoringEventHandlers {
                     await this._monitoringRepository.connectToFirstAvailableMonitoring(treatmentId)
                 } catch (error) {
                     // emit NOT AVAILABLE MONITORING DEVICES 
+                    throw error;
+                }
+            })
+            .on<HospitalTreatmentClosed>(HospitalTreatmentClosed.name, async ({ treatmentId }) => {
+                try {
+                    await this._monitoringRepository.disconnectTreatmentFormMonitoring(treatmentId)
+                } catch (error) {
                     throw error;
                 }
             })

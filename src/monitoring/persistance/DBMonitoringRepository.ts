@@ -39,6 +39,16 @@ export default class DBMonitoringRepository extends KnexConnector implements Mon
             throw new DBMonitoringRepositoryError(`[connectToFirstAvailableDevice] - ${error.message}`);
         }
     }
+    async disconnectTreatmentFormMonitoring(hospitalTreatmentId: Guid): Promise<void> {
+        try {
+            await this.knex(this._table).update({
+                hospital_treatment: null,
+                modified_at: this.knex.fn.now()
+            }).where({ hospital_treatment: hospitalTreatmentId.toString() })
+        } catch (error) {
+            throw new DBMonitoringRepositoryError(`[disconnectTreatmentFormMonitoring] - ${error.message}`);
+        }
+    }
 
     private toMonitoring(data: any): Monitoring {
         return new Monitoring(new Guid(data.id), new Guid(data.hospital_treatment), {
