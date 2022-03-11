@@ -157,8 +157,8 @@ export default class AppDependencyContainer implements DependencyContainer {
     }
 
     private async createChannels() {
-        this._mqtt = new MqttConnection("mqtt://localhost")
-        const connection = await connect("amqp://localhost")
+        this._mqtt = new MqttConnection(this._config.mqtt)
+        const connection = await connect(this._config.rabbitMq)
         const serverChannel = await channel(connection)
         const clientChannel = await channel(connection)
 

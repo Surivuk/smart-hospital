@@ -5,6 +5,8 @@ export interface WebConfig {
 }
 export interface ConfigData {
     web: WebConfig,
+    mqtt: string,
+    rabbitMq: string
 }
 
 export default class Config extends BaseConfig {
@@ -17,7 +19,9 @@ export default class Config extends BaseConfig {
         return {
             web: {
                 port: this.convertToNumber("PORT", env.PORT)
-            }
+            },
+            mqtt: this.convertToString("MQTT_URL", env.MQTT_URL),
+            rabbitMq: this.convertToString("RABBIT_MQ_URL", env.RABBIT_MQ_URL)
         }
     }
 }
