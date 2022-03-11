@@ -12,11 +12,10 @@ async function main() {
 
 }
 
-setTimeout(() => {
-    main()
-        .then(() => { console.log("[APPLICATION] Started") })
-        .catch((err) => console.log("[APPLICATION]", err))
-}, 1000 * 10)
+main()
+    .then(() => { console.log("[APPLICATION] Started") })
+    .catch((err) => console.log("[APPLICATION]", err))
+
 
 
 
