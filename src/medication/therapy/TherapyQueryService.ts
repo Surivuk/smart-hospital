@@ -8,6 +8,7 @@ export type TherapyReadModel = {
 }
 export type Medicament = {
     medicamentId: string;
+    name: string
     strength: string;
     amount: number;
     route: number;

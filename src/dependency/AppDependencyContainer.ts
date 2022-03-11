@@ -43,6 +43,7 @@ import ESHospitalTreatmentRepository from '@medication/hospitalTreatment/persist
 import { HospitalTreatmentEventStore } from '@medication/hospitalTreatment/persistance/HospitalTreatmentEventStore';
 import HospitalTreatmentReadWorker from '@medication/hospitalTreatment/persistance/HospitalTreatmentReadWorker';
 import DBMedicalCardQueryService from '@medication/medicalCard/persistance/DBMedicalCardQueryService';
+import DBMedicamentQueryService from "@adminstration/medicaments/persistance/DBMedicamentQueryService";
 import ESMedicalCardRepository from '@medication/medicalCard/persistance/ESMedicalCardRepository';
 import { MedicalCardEventStore } from '@medication/medicalCard/persistance/MedicalCardEventStore';
 import MedicalCardReadWorker from '@medication/medicalCard/persistance/MedicalCardReadWorker';
@@ -106,7 +107,8 @@ export default class AppDependencyContainer implements DependencyContainer {
             therapyQueryService: new DBTherapyQueryService(),
             hospitalTreatmentQueryService: new DBHospitalTreatmentQueryService(),
             alarmNotificationQueryService: new DBAlarmNotificationQueryService(),
-            examinationQueryService: new DBExaminationQueryService()
+            examinationQueryService: new DBExaminationQueryService(),
+            medicamentQueryService: new DBMedicamentQueryService()
         }
 
         this._httpServer = new HttpApi(this._dependency)

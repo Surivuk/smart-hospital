@@ -44,6 +44,7 @@ export default class DBTherapyQueryService extends KnexConnector implements Ther
     private toMedicament(data: any): Medicament {
         return {
             medicamentId: data.medicament_id,
+            name: data.medicament_name,
             strength: data.strength,
             amount: data.amount,
             route: data.route,
@@ -57,14 +58,7 @@ export default class DBTherapyQueryService extends KnexConnector implements Ther
             id: data.id,
             label: data.label !== null ? data.label : "",
             type: data.type,
-            medicaments: medications.map(medication => ({
-                medicamentId: medication.medicament_id,
-                strength: medication.strength,
-                amount: medication.amount,
-                route: medication.route,
-                frequency: medication.frequency,
-                createdAt: data.created_at
-            }))
+            medicaments: medications.map(medicament => this.toMedicament(medicament))
         }
     }
 }

@@ -1,7 +1,6 @@
 import { Knex } from "knex";
 
 export async function up(knex: Knex): Promise<void> {
-    await knex.schema.dropViewIfExists("hospital_treatment_view")
     return knex.schema.raw(`CREATE VIEW hospital_treatment_view AS 
         SELECT 
             ht.*,
