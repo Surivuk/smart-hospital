@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "productionStart": "node -r ./loadEnv ./dist/src/app.js",
-    "start": "npm run build && node -r ./loadEnv ./dist/src/app.js",
-    "build": "tsc && tsc-alias",
+    "productionStart": "node -r ./dist/loadEnv ./dist/src/app.js",
+    "start": "npm run build && node -r ./dist/loadEnv ./dist/src/app.js",
+    "build": "tsc && tsc-alias && cp loadEnv ./dist/",
     "dev": "ts-node-dev -r tsconfig-paths/register -r loadEnv src/app.ts",
     "test": "jest",
     "silent-test": "jest --silent --coverage=false"
