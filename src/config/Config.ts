@@ -5,7 +5,8 @@ export interface ConfigData {
     port: number,
     mqtt: string,
     rabbitMq: string
-    eventStore: string
+    eventStore: string,
+    smartHospitalUi: string
 }
 
 export default class Config extends BaseConfig {
@@ -19,7 +20,8 @@ export default class Config extends BaseConfig {
             port: this.convertToNumber("PORT", env.PORT),
             eventStore: this.convertToString("EVENT_STORE_URL", env.EVENT_STORE_URL),
             mqtt: this.convertToString("MQTT_URL", env.MQTT_URL),
-            rabbitMq: this.convertToString("RABBIT_MQ_URL", env.RABBIT_MQ_URL)
+            rabbitMq: this.convertToString("RABBIT_MQ_URL", env.RABBIT_MQ_URL),
+            smartHospitalUi: this.convertToString("SMART_HOSPITAL_UI", env.SMART_HOSPITAL_UI),
         }
     }
 }

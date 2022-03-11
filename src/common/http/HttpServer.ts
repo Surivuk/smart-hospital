@@ -1,3 +1,4 @@
+import { ConfigData } from '@app/config/Config';
 import express, { Application, Express, NextFunction, Request, Response } from 'express';
 import http, { createServer } from "http"
 import morgan from 'morgan';
@@ -13,12 +14,12 @@ export default abstract class HttpServer {
     private _io!: Server;
     private _app: Application
 
-    constructor() {
+    constructor(private readonly _config: ConfigData) {
         this._app = express()
         this._server = createServer(this._app)
         this._io = new Server(this._server, {
             cors: {
-                origin: "http://localhost:3000",
+                origin: _config.smartHospitalUi,
                 methods: ["GET", "POST"]
             }
         })
