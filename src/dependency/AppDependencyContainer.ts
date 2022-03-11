@@ -1,10 +1,9 @@
 import AdminstrationProcessor from '@adminstration/AdminstrationProcessor';
 import MockDoctorQueryService from '@adminstration/doctor/MockPatientQueryService';
+import DBMedicamentQueryService from '@adminstration/medicaments/persistance/DBMedicamentQueryService';
 import DBPatientQueryService from '@adminstration/patient/DBPatientQueryService';
 import DBPatientRepository from '@adminstration/patient/DBPatientRepository';
-import MockPatientRepository from '@adminstration/patient/MockPatientRepository';
 import DBAlarmNotificationQueryService from '@alarming/perstitance/DBAlarmNotificationQueryService';
-import MockPatientQueryService from '@app/adminstration/patient/MockPatientQueryService';
 import AlarmingEventHandlers from '@app/alarming/AlarmingEventHandlers';
 import AlarmingProcessor from '@app/alarming/AlarmingProcessor';
 import DBAlarmNotificationRepository from '@app/alarming/perstitance/DBAlarmNotificationRepository';
@@ -13,6 +12,7 @@ import DBAlarmRepository from '@app/alarming/perstitance/DBAlarmRepository';
 import MemoryAlarmRepository from '@app/alarming/perstitance/MemoryAlarmRepository';
 import HttpApi from '@app/api/http/HttpApi';
 import MqttApi from '@app/api/mqtt/MqttApi';
+import Config, { ConfigData } from '@app/config/Config';
 import NotificationEventHandlers from '@app/notification/NotificationEventHandlers';
 import NotificationProcessor from '@app/notification/NotificationProcessor';
 import MqttConnection from '@common/mqtt/MqttConnection';
@@ -43,7 +43,6 @@ import ESHospitalTreatmentRepository from '@medication/hospitalTreatment/persist
 import { HospitalTreatmentEventStore } from '@medication/hospitalTreatment/persistance/HospitalTreatmentEventStore';
 import HospitalTreatmentReadWorker from '@medication/hospitalTreatment/persistance/HospitalTreatmentReadWorker';
 import DBMedicalCardQueryService from '@medication/medicalCard/persistance/DBMedicalCardQueryService';
-import DBMedicamentQueryService from "@adminstration/medicaments/persistance/DBMedicamentQueryService";
 import ESMedicalCardRepository from '@medication/medicalCard/persistance/ESMedicalCardRepository';
 import { MedicalCardEventStore } from '@medication/medicalCard/persistance/MedicalCardEventStore';
 import MedicalCardReadWorker from '@medication/medicalCard/persistance/MedicalCardReadWorker';
@@ -87,7 +86,7 @@ export default class AppDependencyContainer implements DependencyContainer {
     private _webSocket!: AppSocket;
     private _httpServer!: HttpApi;
 
-    constructor(private readonly _config: any) { }
+    constructor(private readonly _config: ConfigData) { }
 
     async createDependency(): Promise<this> {
         await this.createChannels();
@@ -191,7 +190,7 @@ export default class AppDependencyContainer implements DependencyContainer {
         return this;
     }
     startHttpApi(): this {
-        this._httpServer.start(this._config.port)
+        this._httpServer.start(this._config.web.port)
         return this;
     }
     startReadWorkers(): this {

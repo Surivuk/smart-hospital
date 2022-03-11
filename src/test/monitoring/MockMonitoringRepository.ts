@@ -3,6 +3,9 @@ import Monitoring from "@monitoring/Monitoring";
 import MonitoringRepository from "@monitoring/MonitoringRepository";
 
 export default class MockMonitoringRepository implements MonitoringRepository {
+    disconnectTreatmentFormMonitoring(hospitalTreatmentId: Guid): Promise<void> {
+        throw new Error("Method not implemented.");
+    }
     private _monitoring!: Monitoring;
 
     setMonitoring(monitoring: Monitoring): void {

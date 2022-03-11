@@ -9,7 +9,6 @@ export interface HttpRouterHook {
 
 export default abstract class HttpServer {
 
-    private isStarted = false;
     private _server: http.Server
     private _io!: Server;
     private _app: Application

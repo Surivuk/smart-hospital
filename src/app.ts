@@ -1,7 +1,8 @@
+import Config from './config/Config';
 import AppDependencyContainer from './dependency/AppDependencyContainer';
 
 async function main() {
-    const dependencyContainer = new AppDependencyContainer({ port: 9000 });
+    const dependencyContainer = new AppDependencyContainer(new Config(process.env).config);
     (await dependencyContainer.createDependency())
         .startReadWorkers()
         .registerHandlers()
