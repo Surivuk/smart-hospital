@@ -11,8 +11,12 @@ async function main() {
         .startMqttApi()
 
 }
-main()
-    .then(() => { console.log("[APPLICATION] Started") })
-    .catch((err) => console.log("[APPLICATION]", err))
+
+setTimeout(() => {
+    main()
+        .then(() => { console.log("[APPLICATION] Started") })
+        .catch((err) => console.log("[APPLICATION]", err))
+}, 1000 * 10)
+
 
 

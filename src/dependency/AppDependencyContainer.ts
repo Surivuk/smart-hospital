@@ -90,7 +90,7 @@ export default class AppDependencyContainer implements DependencyContainer {
 
     async createDependency(): Promise<this> {
         await this.createChannels();
-        const client = EventStoreDBClient.connectionString("esdb://127.0.0.1:2113?tls=false")
+        const client = EventStoreDBClient.connectionString(this._config.eventStore)
 
         this._dependency = {
             mqtt: this._mqtt,
@@ -157,16 +157,29 @@ export default class AppDependencyContainer implements DependencyContainer {
     }
 
     private async createChannels() {
-        this._mqtt = new MqttConnection(this._config.mqtt)
-        const connection = await connect(this._config.rabbitMq)
-        const serverChannel = await channel(connection)
-        const clientChannel = await channel(connection)
+        try {
+            this._mqtt = new MqttConnection(this._config.mqtt)
+        } catch (error) {
+            console.log("MQTT")
+            throw error
+        }
+   
+        try {
+            const connection = await connect(this._config.rabbitMq)
+            const serverChannel = await channel(connection)
+            const clientChannel = await channel(connection)
+    
+            this._commandChain = new RabbitMqCommandChain(serverChannel, clientChannel, new CommandAdapter());
+            this._eventBus = new RabbitMqEventBus(clientChannel, new DomainEventAdapters());
+    
+            await this._commandChain.start();
+            await this._eventBus.start();
+        } catch (error) {
+            console.log("RABBIT")
+            throw error
+        }
 
-        this._commandChain = new RabbitMqCommandChain(serverChannel, clientChannel, new CommandAdapter());
-        this._eventBus = new RabbitMqEventBus(clientChannel, new DomainEventAdapters());
 
-        await this._commandChain.start();
-        await this._eventBus.start();
     }
 
     registerProcesses(): this {
@@ -190,7 +203,7 @@ export default class AppDependencyContainer implements DependencyContainer {
         return this;
     }
     startHttpApi(): this {
-        this._httpServer.start(this._config.web.port)
+        this._httpServer.start(this._config.port)
         return this;
     }
     startReadWorkers(): this {
