@@ -71,7 +71,7 @@ export default class CommandAdapter {
                 frequency: frequency.toString()
             }))
         }),
-        [OpenHospitalTreatment.name]: ({ medicalCardId, treatmentId }: OpenHospitalTreatment) => ({ medicalCardId: medicalCardId.toString(), treatmentId: treatmentId.toString() }),
+        [OpenHospitalTreatment.name]: ({ medicalCardId, treatmentId, diagnosis }: OpenHospitalTreatment) => ({ medicalCardId: medicalCardId.toString(), treatmentId: treatmentId.toString(), diagnosis: diagnosis.toString() }),
         [ProcessHealthData.name]: ({ monitoringId, data }: ProcessHealthData) => ({ monitoringId: monitoringId.toString(), data }),
         [CreateAlarm.name]: ({ doctorId, alarm }: CreateAlarm) => ({ doctorId: doctorId.toString(), ...alarm.dto() }),
         [ActivateAlarm.name]: ({ alarmId }: ActivateAlarm) => ({ alarmId: alarmId.toString() }),
@@ -105,7 +105,7 @@ export default class CommandAdapter {
             new DetermineTherapy(new Guid(treatmentId), new Guid(therapyId), NotEmptyStringField.create(therapyLabel), medicaments.map(({ medicamentId, strength, amount, route, frequency }: any) =>
                 new MedicamentConsumption(new Guid(medicamentId), strength, amount, ConsumptionRoute.create(route), ConsumptionFrequency.create(frequency)))
             ),
-        [OpenHospitalTreatment.name]: ({ medicalCardId, treatmentId }) => new OpenHospitalTreatment(new Guid(medicalCardId), new Guid(treatmentId)),
+        [OpenHospitalTreatment.name]: ({ medicalCardId, treatmentId, diagnosis }) => new OpenHospitalTreatment(new Guid(medicalCardId), new Guid(treatmentId), new Guid(diagnosis)),
         [ProcessHealthData.name]: ({ monitoringId, data }) => new ProcessHealthData(new Guid(monitoringId), data),
         [CreateAlarm.name]: ({ doctorId, treatmentId, id, name, trigger }) => new CreateAlarm(
             Guid.create(doctorId),

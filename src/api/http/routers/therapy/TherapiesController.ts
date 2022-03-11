@@ -1,6 +1,5 @@
 import CommandChain from '@app/CommandChain';
 import { AddMedicamentToTherapy, ChangeTherapyLabel, DetermineTherapy, PrescribeTherapy, RemoveMedicamentFromTherapy } from '@app/commands/MedicationCommands';
-import NormalStringField from '@common/fields/NormalStringField';
 import NotEmptyStringField from '@common/fields/NotEmptyStringField';
 import Guid, { GuidFactory } from '@common/Guid';
 import ConsumptionFrequency from '@medication/medicamentConsumption/ConsumptionFrequency';
@@ -78,5 +77,9 @@ export default class TherapiesController {
     }
     async therapies(req: Request, res: Response) {
         res.json(await this._query.therapies())
+    }
+    async therapiesForTreatmentUntil(req: Request, res: Response) {
+        const { treatmentId, date } = req.query
+        res.json(await this._query.therapiesForTreatmentUntil(Guid.create(treatmentId as string), new Date(date as string)))
     }
 }

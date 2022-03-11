@@ -17,7 +17,7 @@ export default class DBHealthDataQueryService extends KnexConnector implements H
             end.setDate(end.getDate() + 1)
             const result = await this.knex.raw(`SELECT * 
             FROM health_data 
-            WHERE hospital_treatment = '${treatmentId.toString()}' AND timestamp BETWEEN '${this.adapt(start)}' AND '${this.adapt(end)}';`)
+            WHERE hospital_treatment = ? AND CAST("timestamp"  AS DATE) = ?`, [treatmentId.toString(), `${this.adapt(date)}%`])
 
             return result.rows.map((row: any) => ({ ...row }));
         } catch (error) {

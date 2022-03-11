@@ -3,6 +3,7 @@ import EventStoreEvent from '@common/EventStoreEvent';
 import Guid from '@common/Guid';
 
 import { HospitalTreatmentClosed, HospitalTreatmentCreated, TherapyAddedToHospitalTreatment, TherapyRemovedFromHospitalTreatment } from '../HospitalTreatmentEvents';
+import NormalStringField from '@common/fields/NormalStringField';
 
 
 interface EventStoreAdapter<E extends EventStoreEvent, D extends HospitalTreatmentEvents> {
@@ -10,7 +11,7 @@ interface EventStoreAdapter<E extends EventStoreEvent, D extends HospitalTreatme
     event(event: D["data"]): E
 }
 
-export type HospitalTreatmentCreatedEvent = JSONEventType<"hospital-treatment-created", { treatmentId: string; medicalCardId: string; }>;
+export type HospitalTreatmentCreatedEvent = JSONEventType<"hospital-treatment-created", { treatmentId: string; medicalCardId: string; diagnosis: string }>;
 export type TherapyAddedToHospitalTreatmentEvent = JSONEventType<"therapy-added-to-treatment", {
     treatmentId: string;
     therapyId: string;
@@ -50,9 +51,10 @@ export class HospitalTreatmentEventStore {
                 data: {
                     treatmentId: event.treatmentId.toString(),
                     medicalCardId: event.medicationCardId.toString(),
+                    diagnosis: event.diagnosis.toString()
                 }
             }),
-            event: (data) => new HospitalTreatmentCreated(new Guid(data.treatmentId), new Guid(data.medicalCardId))
+            event: (data) => new HospitalTreatmentCreated(new Guid(data.treatmentId), new Guid(data.medicalCardId), NormalStringField.create(data.diagnosis))
         }
     }
     private get therapyAddedToHospitalTreatment(): EventStoreAdapter<TherapyAddedToHospitalTreatment, TherapyAddedToHospitalTreatmentEvent> {

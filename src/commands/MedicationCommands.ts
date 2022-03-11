@@ -13,7 +13,7 @@ export class DetermineTherapy implements ChainCommand {
     constructor(public readonly treatmentId: Guid, public readonly therapyId: Guid, public readonly treatmentLabel: StringField, public readonly medicaments: MedicamentConsumption[]) { }
 }
 export class OpenHospitalTreatment implements ChainCommand {
-    constructor(public readonly medicalCardId: Guid, public readonly treatmentId: Guid) { }
+    constructor(public readonly medicalCardId: Guid, public readonly treatmentId: Guid, public readonly diagnosis: StringField) { }
 }
 export class AddMedicamentToTherapy implements ChainCommand {
     constructor(public readonly therapyId: Guid, public readonly medicament: MedicamentConsumption) { }

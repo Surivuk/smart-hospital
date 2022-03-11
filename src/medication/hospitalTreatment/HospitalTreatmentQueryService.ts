@@ -4,6 +4,8 @@ export type HospitalTreatmentReadModel = {
     id: string;
     medicalCard: string
     patient: string
+    diagnosis: string
+    monitoring?: string
     closed: boolean,
     createdAt: string
     closedAt?: string

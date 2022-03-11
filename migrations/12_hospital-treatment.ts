@@ -4,6 +4,7 @@ export async function up(knex: Knex): Promise<void> {
     await knex.schema.createTable("hospital_treatment", (table) => {
         table.string("id").nullable().primary();
         table.string("medical_card").index().references("id").inTable("medical_card").onUpdate("CASCADE").onDelete("CASCADE");
+        table.string("diagnosis", 1000).notNullable();
         table.boolean("closed").nullable();
         table.timestamp("created_at").notNullable();
         table.timestamp("closed_at").nullable();

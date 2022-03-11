@@ -1,5 +1,6 @@
 import { AggregateRoot } from "@common/AggregateRoot";
 import EventStoreEvent from "@common/EventStoreEvent";
+import StringField from "@common/fields/StringField";
 import Guid from "@common/Guid";
 import { HospitalTreatmentClosed, HospitalTreatmentCreated, TherapyAddedToHospitalTreatment, TherapyRemovedFromHospitalTreatment } from "./HospitalTreatmentEvents";
 
@@ -14,9 +15,9 @@ export default class HospitalTreatment extends AggregateRoot {
     private _therapies: Guid[] = [];
     private _closed: boolean = false;
 
-    static create(id: Guid, medicalCardId: Guid): HospitalTreatment {
+    static create(id: Guid, medicalCardId: Guid, diagnosis: StringField): HospitalTreatment {
         const result = new HospitalTreatment()
-        result.createHospitalTreatment(id, medicalCardId)
+        result.createHospitalTreatment(id, medicalCardId, diagnosis)
         return result
     }
 
@@ -33,8 +34,8 @@ export default class HospitalTreatment extends AggregateRoot {
             this.applyChange(new HospitalTreatmentClosed(this.id))
     }
 
-    private createHospitalTreatment(id: Guid, medicalCardId: Guid) {
-        this.applyChange(new HospitalTreatmentCreated(id, medicalCardId))
+    private createHospitalTreatment(id: Guid, medicalCardId: Guid, diagnosis: StringField) {
+        this.applyChange(new HospitalTreatmentCreated(id, medicalCardId, diagnosis))
     }
     private applyHospitalTreatmentCreated(event: HospitalTreatmentCreated) {
         this._id = event.treatmentId

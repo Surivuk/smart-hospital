@@ -1,6 +1,6 @@
 import KnexConnector from "@common/db/KnexConnector";
 import Guid from "@common/Guid";
-import TherapyQueryService, { TherapyReadModel } from "../TherapyQueryService";
+import TherapyQueryService, { Medicament, TherapyReadModel } from "../TherapyQueryService";
 
 export class DBTherapyQueryServiceError extends Error {
     constructor(message: string) {
@@ -28,6 +28,29 @@ export default class DBTherapyQueryService extends KnexConnector implements Ther
             throw new DBTherapyQueryServiceError(`[therapies] - ${error.message}`);
         }
     }
+    async therapiesForTreatmentUntil(treatmentId: Guid, date: Date): Promise<Medicament[]> {
+        try {
+            const therapies = await this.knex("hospital_treatment_therapies").where({ hospital_treatment: treatmentId.toString() })
+            const medicaments = await this.knex("therapy_medicaments")
+                .whereIn("therapy", therapies.map(t => t.therapy))
+                .whereRaw(`created_at < ?`, [date.toISOString()])
+
+            return medicaments.map((row: any) => this.toMedicament(row))
+        } catch (error) {
+            throw new DBTherapyQueryServiceError(`[therapiesForTreatmentUntil] - ${error.message}`);
+        }
+    }
+
+    private toMedicament(data: any): Medicament {
+        return {
+            medicamentId: data.medicament_id,
+            strength: data.strength,
+            amount: data.amount,
+            route: data.route,
+            frequency: data.frequency,
+            createdAt: data.created_at
+        }
+    }
 
     private toTherapy(data: any, medications: any[]): TherapyReadModel {
         return {
@@ -39,7 +62,8 @@ export default class DBTherapyQueryService extends KnexConnector implements Ther
                 strength: medication.strength,
                 amount: medication.amount,
                 route: medication.route,
-                frequency: medication.frequency
+                frequency: medication.frequency,
+                createdAt: data.created_at
             }))
         }
     }

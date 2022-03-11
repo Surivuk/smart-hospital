@@ -43,6 +43,8 @@ export default class DBHospitalTreatmentQueryService extends KnexConnector imple
         return {
             id: data.id,
             medicalCard: data.medical_card,
+            diagnosis: data.diagnosis,
+            monitoring: data.monitoring !== null ? data.monitoring : "",
             patient: data.patient,
             closed: data.closed !== null ? data.closed : false,
             createdAt: data.created_at,

@@ -37,9 +37,9 @@ export default class MedicationProcessor {
                 medicalCard.noteTherapy(therapyId)
                 await this._medicalCardRepository.save(medicalCard);
             })
-            .registerProcessor<OpenHospitalTreatment>(OpenHospitalTreatment.name, async ({ medicalCardId, treatmentId }) => {
+            .registerProcessor<OpenHospitalTreatment>(OpenHospitalTreatment.name, async ({ medicalCardId, treatmentId, diagnosis }) => {
                 const medicalCard = await this._medicalCardRepository.medicalCard(medicalCardId);
-                await this._treatmentRepository.save(HospitalTreatment.create(treatmentId, medicalCardId))
+                await this._treatmentRepository.save(HospitalTreatment.create(treatmentId, medicalCardId, diagnosis))
                 medicalCard.noteHospitalTreatment(treatmentId)
                 await this._medicalCardRepository.save(medicalCard);
                 this._eventBus.emit(new HospitalTreatmentOpened(treatmentId))

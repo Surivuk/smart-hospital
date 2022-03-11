@@ -34,7 +34,7 @@ export default class HttpApi extends HttpServer {
             ).router())
             .use("/doctors", new DoctorRouter(new DoctorsController(this._dependency.doctorQueryService)).router())
             .use("/medical-cards", new MedicalCardsRouter(new MedicalCardsController(this._dependency.medicalCardQueryService)).router())
-            .use("/examinations", new ExaminationsRouter(new ExaminationsController(this._dependency.commandChain)).router())
+            .use("/examinations", new ExaminationsRouter(new ExaminationsController(this._dependency.commandChain, this._dependency.examinationQueryService)).router())
             .use("/therapies", new TherapiesRouter(new TherapiesController(this._dependency.commandChain, this._dependency.therapyQueryService)).router())
             .use("/hospital-treatments", new TreatmentsRouter(new TreatmentsController(this._dependency.commandChain, this._dependency.hospitalTreatmentQueryService)).router())
             .use("/health-center", new HealthCenterRouter(new HealthCenterController(this._dependency.healthDataQueryService)).router())

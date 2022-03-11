@@ -11,6 +11,7 @@ export default class TherapiesRouter implements HttpRouter {
     router(): Router {
         return Router()
             .get("/", asyncHandler((req, res) => this._controller.therapies(req, res)))
+            .get("/until", asyncHandler((req, res) => this._controller.therapiesForTreatmentUntil(req, res)))
             .get("/:id", asyncHandler((req, res) => this._controller.therapy(req, res)))
             .post("/prescribe", asyncHandler((req, res) => this._controller.prescribeTherapy(req, res)))
             .post("/determine", asyncHandler((req, res) => this._controller.determineTherapy(req, res)))

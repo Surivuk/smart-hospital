@@ -34,8 +34,10 @@ import Temperature from '@healthCenter/healthData/Temperature';
 import HealthStorage from '@healthCenter/HealthStorage';
 import DBHealthDataQueryService from '@healthCenter/persistance/DBHealthDataQueryService';
 import DBHealthDataRepository from '@healthCenter/persistance/DBHealthDataRepository';
+import DBExaminationQueryService from '@medication/examination/persistance/DBExaminationQueryService';
 import ESExaminationRepository from '@medication/examination/persistance/ESExaminationRepository';
 import { ExaminationEventStore } from '@medication/examination/persistance/ExaminationEventStore';
+import ExaminationReadWorker from '@medication/examination/persistance/ExaminationReadWorker';
 import DBHospitalTreatmentQueryService from '@medication/hospitalTreatment/persistance/DBHospitalTreatmentQueryService';
 import ESHospitalTreatmentRepository from '@medication/hospitalTreatment/persistance/ESHospitalTreatmentRepository';
 import { HospitalTreatmentEventStore } from '@medication/hospitalTreatment/persistance/HospitalTreatmentEventStore';
@@ -103,7 +105,8 @@ export default class AppDependencyContainer implements DependencyContainer {
             alarmQueryService: new DBAlarmQueryService(),
             therapyQueryService: new DBTherapyQueryService(),
             hospitalTreatmentQueryService: new DBHospitalTreatmentQueryService(),
-            alarmNotificationQueryService: new DBAlarmNotificationQueryService()
+            alarmNotificationQueryService: new DBAlarmNotificationQueryService(),
+            examinationQueryService: new DBExaminationQueryService()
         }
 
         this._httpServer = new HttpApi(this._dependency)
@@ -135,9 +138,9 @@ export default class AppDependencyContainer implements DependencyContainer {
             SPO2: (timestamp, value) => new SPO2(timestamp, parseInt(value)),
             "systolic-blood-pressure": (timestamp, value) => new SystolicBloodPressure(timestamp, parseInt(value)),
             "diastolic-blood-pressure": (timestamp, value) => new DiastolicBloodPressure(timestamp, parseInt(value)),
-            PI: (timestamp, value) => new PI(timestamp, parseInt(value)),
+            PI: (timestamp, value) => new PI(timestamp, parseFloat(value)),
             pulse: (timestamp, value) => new Pulse(timestamp, parseInt(value)),
-            temperature: (timestamp, value) => new Temperature(timestamp, parseInt(value)),
+            temperature: (timestamp, value) => new Temperature(timestamp, parseFloat(value)),
         }))
         this._alarmingEventHandlers = new AlarmingEventHandlers(alarmRepository, alarmNotificationRepository)
         this._notificationEventHandlers = new NotificationEventHandlers(this._webSocket, this._dependency.alarmQueryService)
@@ -146,6 +149,7 @@ export default class AppDependencyContainer implements DependencyContainer {
         this._readWorkers.push(new MedicalCardReadWorker(client, new MedicalCardEventStore()))
         this._readWorkers.push(new HospitalTreatmentReadWorker(client))
         this._readWorkers.push(new TherapyReadWorker(client))
+        this._readWorkers.push(new ExaminationReadWorker(client))
 
 
         return this;

@@ -10,6 +10,7 @@ export default class ExaminationsRouter implements HttpRouter {
 
     router(): Router {
         return Router()
+            .get("/:id", asyncHandler((req, res) => this._controller.examination(req, res)))
             .post("/", asyncHandler((req, res) => this._controller.createExamination(req, res)))
     }
 
