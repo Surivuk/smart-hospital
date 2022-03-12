@@ -1,4 +1,5 @@
 import DoctorsController from "@app/api/http/routers/doctors/DoctorsController";
+import { ConfigData } from "@app/config/Config";
 import { Dependency } from "@app/dependency/DependencyContainer";
 import HttpServer from "@common/http/HttpServer";
 import cors from "cors";
@@ -24,8 +25,8 @@ import TreatmentsRouter from "./routers/treatments/TreatmentsRouter";
 
 export default class HttpApi extends HttpServer {
 
-    constructor(private readonly _dependency: Dependency) {
-        super()
+    constructor(private readonly _dependency: Dependency, config: ConfigData) {
+        super(config)
     }
 
     protected bindRoutes(app: Application): Application {

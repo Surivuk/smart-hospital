@@ -14,12 +14,12 @@ export default abstract class HttpServer {
     private _io!: Server;
     private _app: Application
 
-    constructor(private readonly _config: ConfigData) {
+    constructor(config: ConfigData) {
         this._app = express()
         this._server = createServer(this._app)
         this._io = new Server(this._server, {
             cors: {
-                origin: _config.smartHospitalUi,
+                origin: config.smartHospitalUi,
                 methods: ["GET", "POST"]
             }
         })

@@ -55,6 +55,7 @@ import TherapyReadWorker from '@medication/therapy/persistance/TherapyReadWorker
 import MonitoringEventHandlers from '@monitoring/MonitoringEventHandlers';
 import MonitoringProcessor from '@monitoring/MonitoringProcessor';
 import DBMonitoringRepository from '@monitoring/persistance/DBMonitoringRepository';
+import { config } from 'dotenv';
 
 import DependencyContainer, { Dependency } from './DependencyContainer';
 
@@ -110,7 +111,7 @@ export default class AppDependencyContainer implements DependencyContainer {
             medicamentQueryService: new DBMedicamentQueryService()
         }
 
-        this._httpServer = new HttpApi(this._dependency)
+        this._httpServer = new HttpApi(this._dependency, this._config)
         this._webSocket = new AppSocket(this._httpServer.io);
 
         // Repositories
