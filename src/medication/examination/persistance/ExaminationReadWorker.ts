@@ -60,6 +60,6 @@ export default class ExaminationReadWorker extends KnexConnector implements Read
 
     }
     private async examinationCreated(id: string, data: any) {
-        return this.knex("examination").insert({ id: id, diagnosis: data.diagnosis, created_at: this.knex.fn.now() })
+        return this.knex("medication.examination").insert({ id: id, diagnosis: data.diagnosis, created_at: this.knex.fn.now() })
     }
 }

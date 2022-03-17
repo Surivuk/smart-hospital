@@ -1,15 +1,14 @@
 import AdminstrationProcessor from '@adminstration/AdminstrationProcessor';
-import MockDoctorQueryService from '@adminstration/doctor/MockPatientQueryService';
-import DBMedicamentQueryService from '@adminstration/medicaments/persistance/DBMedicamentQueryService';
+import DBMedicamentQueryService from '@medication/medicaments/persistance/DBMedicamentQueryService';
 import DBPatientQueryService from '@adminstration/patient/DBPatientQueryService';
 import DBPatientRepository from '@adminstration/patient/DBPatientRepository';
-import DBAlarmNotificationQueryService from '@alarming/perstitance/DBAlarmNotificationQueryService';
+import DBAlarmNotificationQueryService from '@alarming/persistance/DBAlarmNotificationQueryService';
 import AlarmingEventHandlers from '@app/alarming/AlarmingEventHandlers';
 import AlarmingProcessor from '@app/alarming/AlarmingProcessor';
-import DBAlarmNotificationRepository from '@app/alarming/perstitance/DBAlarmNotificationRepository';
-import DBAlarmQueryService from '@app/alarming/perstitance/DBAlarmQueryService';
-import DBAlarmRepository from '@app/alarming/perstitance/DBAlarmRepository';
-import MemoryAlarmRepository from '@app/alarming/perstitance/MemoryAlarmRepository';
+import DBAlarmNotificationRepository from '@alarming/persistance/DBAlarmNotificationRepository';
+import DBAlarmQueryService from '@alarming/persistance/DBAlarmQueryService';
+import DBAlarmRepository from '@alarming/persistance/DBAlarmRepository';
+import MemoryAlarmRepository from '@alarming/persistance/MemoryAlarmRepository';
 import HttpApi from '@app/api/http/HttpApi';
 import MqttApi from '@app/api/mqtt/MqttApi';
 import Config, { ConfigData } from '@app/config/Config';
@@ -58,6 +57,7 @@ import DBMonitoringRepository from '@monitoring/persistance/DBMonitoringReposito
 import { config } from 'dotenv';
 
 import DependencyContainer, { Dependency } from './DependencyContainer';
+import DBDoctorQueryService from '@adminstration/doctor/DBDoctorQueryService';
 
 
 export default class AppDependencyContainer implements DependencyContainer {
@@ -100,7 +100,7 @@ export default class AppDependencyContainer implements DependencyContainer {
 
             // QueryServices
             patientQueryService: new DBPatientQueryService(),
-            doctorQueryService: new MockDoctorQueryService(),
+            doctorQueryService: new DBDoctorQueryService(),
             medicalCardQueryService: new DBMedicalCardQueryService(),
             healthDataQueryService: new DBHealthDataQueryService(),
             alarmQueryService: new DBAlarmQueryService(),
@@ -148,7 +148,7 @@ export default class AppDependencyContainer implements DependencyContainer {
         this._notificationEventHandlers = new NotificationEventHandlers(this._webSocket, this._dependency.alarmQueryService)
 
         // ReadWorkers
-        this._readWorkers.push(new MedicalCardReadWorker(client, new MedicalCardEventStore()))
+        this._readWorkers.push(new MedicalCardReadWorker(client))
         this._readWorkers.push(new HospitalTreatmentReadWorker(client))
         this._readWorkers.push(new TherapyReadWorker(client))
         this._readWorkers.push(new ExaminationReadWorker(client))

@@ -9,10 +9,12 @@ export class DBMedicalCardQueryServiceError extends Error {
 }
 
 export default class DBMedicalCardQueryService extends KnexConnector implements MedicalCardQueryService {
+    private _medicalCard = "medication.medical_card"
+    private _notedEvents = "medication.noted_events"
     async medicalCard(id: Guid): Promise<MedicalCardReadModel> {
         try {
-            const rows = await this.knex("medical_card").where({ id: id.toString() })
-            const notedEventsRows = await this.knex("noted_events").where({ medical_card: id.toString() })
+            const rows = await this.knex(this._medicalCard).where({ id: id.toString() })
+            const notedEventsRows = await this.knex(this._notedEvents).where({ medical_card: id.toString() })
             if (rows.length === 0) throw new Error(`Not found medicalCard for provided id. Id: "${id.toString()}"`)
             return rows.map(row => this.toMedicalCard(row, notedEventsRows))[0]
         } catch (error) {
@@ -21,8 +23,8 @@ export default class DBMedicalCardQueryService extends KnexConnector implements 
     }
     async medicalCards(): Promise<MedicalCardReadModel[]> {
         try {
-            const rows = await this.knex("medical_card")
-            const notedEventsRows = await this.knex("noted_events")
+            const rows = await this.knex(this._medicalCard)
+            const notedEventsRows = await this.knex(this._notedEvents)
             return rows.map(row => this.toMedicalCard(row, notedEventsRows))
         } catch (error) {
             throw new DBMedicalCardQueryServiceError(`[medicalCard] - ${error.message}`);

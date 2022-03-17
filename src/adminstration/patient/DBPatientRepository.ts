@@ -14,7 +14,7 @@ export class DBPatientRepositoryError extends Error {
 export default class DBPatientRepository extends KnexConnector implements PatientRepository {
     async createPatient(id: Guid, name: Name, gender: Gender, birthDate: NumberField): Promise<void> {
         try {
-            await this.knex("patient").insert({
+            await this.knex("administration.patient").insert({
                 id: id.toString(),
                 first_name: name.firstName,
                 last_name: name.lastName,

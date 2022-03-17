@@ -7,16 +7,13 @@ import { RedisClientType } from '@node-redis/client/dist/lib/client';
 
 class HospitalTreatment {
     public treatmentId: string;
-    public medicalCardId: string;
     public therapies: string[];
 
     constructor(data: {
         treatmentId: string,
-        medicalCardId: string,
         therapies: string[]
     }) {
         this.treatmentId = data.treatmentId;
-        this.medicalCardId = data.medicalCardId;
         this.therapies = data.therapies;
     }
 

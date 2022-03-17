@@ -16,7 +16,7 @@ export default class DBHealthDataQueryService extends KnexConnector implements H
             const end = new Date(date)
             end.setDate(end.getDate() + 1)
             const result = await this.knex.raw(`SELECT * 
-            FROM health_data 
+            FROM health_center.health_data 
             WHERE hospital_treatment = ? AND CAST("timestamp"  AS DATE) = ?`, [treatmentId.toString(), `${this.adapt(date)}%`])
 
             return result.rows.map((row: any) => ({ ...row }));

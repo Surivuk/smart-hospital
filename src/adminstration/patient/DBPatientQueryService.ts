@@ -1,10 +1,7 @@
-import Gender from "@adminstration/Gender";
-import Name from "@adminstration/Name";
-import KnexConnector from "@common/db/KnexConnector";
-import NumberField from "@common/fields/NumberField";
-import Guid from "@common/Guid";
-import PatientQueryService, { PatientReadModel } from "./PatientQueryService";
-import PatientRepository from "./PatientRepository";
+import KnexConnector from '@common/db/KnexConnector';
+import Guid from '@common/Guid';
+
+import PatientQueryService, { PatientReadModel } from './PatientQueryService';
 
 export class DBPatientRepositoryError extends Error {
     constructor(message: string) {
@@ -13,9 +10,10 @@ export class DBPatientRepositoryError extends Error {
 }
 
 export default class DBPatientQueryService extends KnexConnector implements PatientQueryService {
+    private _patients = "administration.patient"
     async patient(id: Guid): Promise<PatientReadModel> {
         try {
-            const rows = await this.knex("patient").where({ id: id.toString() })
+            const rows = await this.knex(this._patients).where({ id: id.toString() })
             if (rows.length === 0) throw new Error(`Not found patient fir provided id. Id: "${id.toString()}"`)
             return this.toPatient(rows[0])
         } catch (error) {
@@ -24,7 +22,7 @@ export default class DBPatientQueryService extends KnexConnector implements Pati
     }
     async patients(): Promise<PatientReadModel[]> {
         try {
-            return (await this.knex("patient")).map(row => this.toPatient(row))
+            return (await this.knex(this._patients)).map(row => this.toPatient(row))
         } catch (error) {
             throw new DBPatientRepositoryError(`[patients] - ${error.message}`);
         }

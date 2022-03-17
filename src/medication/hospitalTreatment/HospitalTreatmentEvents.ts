@@ -3,7 +3,7 @@ import StringField from "@common/fields/StringField";
 import Guid from "@common/Guid";
 
 export class HospitalTreatmentCreated implements EventStoreEvent {
-    constructor(public readonly treatmentId: Guid, public readonly medicationCardId: Guid, public readonly diagnosis: StringField) { }
+    constructor(public readonly treatmentId: Guid, public readonly diagnosis: StringField) { }
 }
 export class TherapyAddedToHospitalTreatment implements EventStoreEvent {
     constructor(public readonly treatmentId: Guid, public readonly therapyId: Guid) { }

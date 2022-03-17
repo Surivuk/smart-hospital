@@ -1,4 +1,4 @@
-import MedicamentQueryService from '@adminstration/medicaments/MedicamentQueryService';
+import MedicamentQueryService from '@medication/medicaments/MedicamentQueryService';
 import { Request, Response } from 'express-serve-static-core';
 
 export default class MedicamentsController {

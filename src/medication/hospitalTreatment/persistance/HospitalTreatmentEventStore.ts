@@ -11,7 +11,7 @@ interface EventStoreAdapter<E extends EventStoreEvent, D extends HospitalTreatme
     event(event: D["data"]): E
 }
 
-export type HospitalTreatmentCreatedEvent = JSONEventType<"hospital-treatment-created", { treatmentId: string; medicalCardId: string; diagnosis: string }>;
+export type HospitalTreatmentCreatedEvent = JSONEventType<"hospital-treatment-created", { treatmentId: string; diagnosis: string }>;
 export type TherapyAddedToHospitalTreatmentEvent = JSONEventType<"therapy-added-to-treatment", {
     treatmentId: string;
     therapyId: string;
@@ -50,11 +50,10 @@ export class HospitalTreatmentEventStore {
                 type: "hospital-treatment-created",
                 data: {
                     treatmentId: event.treatmentId.toString(),
-                    medicalCardId: event.medicationCardId.toString(),
                     diagnosis: event.diagnosis.toString()
                 }
             }),
-            event: (data) => new HospitalTreatmentCreated(new Guid(data.treatmentId), new Guid(data.medicalCardId), NormalStringField.create(data.diagnosis))
+            event: (data) => new HospitalTreatmentCreated(new Guid(data.treatmentId), NormalStringField.create(data.diagnosis))
         }
     }
     private get therapyAddedToHospitalTreatment(): EventStoreAdapter<TherapyAddedToHospitalTreatment, TherapyAddedToHospitalTreatmentEvent> {

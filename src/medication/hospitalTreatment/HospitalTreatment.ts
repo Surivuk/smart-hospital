@@ -15,9 +15,9 @@ export default class HospitalTreatment extends AggregateRoot {
     private _therapies: Guid[] = [];
     private _closed: boolean = false;
 
-    static create(id: Guid, medicalCardId: Guid, diagnosis: StringField): HospitalTreatment {
+    static create(id: Guid, diagnosis: StringField): HospitalTreatment {
         const result = new HospitalTreatment()
-        result.createHospitalTreatment(id, medicalCardId, diagnosis)
+        result.createHospitalTreatment(id, diagnosis)
         return result
     }
 
@@ -34,8 +34,8 @@ export default class HospitalTreatment extends AggregateRoot {
             this.applyChange(new HospitalTreatmentClosed(this.id))
     }
 
-    private createHospitalTreatment(id: Guid, medicalCardId: Guid, diagnosis: StringField) {
-        this.applyChange(new HospitalTreatmentCreated(id, medicalCardId, diagnosis))
+    private createHospitalTreatment(id: Guid, diagnosis: StringField) {
+        this.applyChange(new HospitalTreatmentCreated(id, diagnosis))
     }
     private applyHospitalTreatmentCreated(event: HospitalTreatmentCreated) {
         this._id = event.treatmentId

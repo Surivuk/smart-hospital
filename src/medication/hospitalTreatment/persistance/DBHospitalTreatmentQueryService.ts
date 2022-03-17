@@ -10,11 +10,14 @@ export class DBHospitalTreatmentQueryServiceError extends Error {
 
 export default class DBHospitalTreatmentQueryService extends KnexConnector implements HospitalTreatmentQueryService {
 
+    private _hospitalTreatment = "medication.hospital_treatment";
+    private _hospitalTreatmentTherapies = "medication.hospital_treatment_therapies_view"
+
     async treatment(id: Guid): Promise<HospitalTreatmentWithTherapiesReadModel> {
         try {
-            const treatment = await this.knex("hospital_treatment_view").where({ id: id.toString() })
+            const treatment = await this.knex(this._hospitalTreatment).where({ id: id.toString() })
             if (treatment.length === 0) throw new Error(`Not found treatment with provided id. Id: "${id.toString()}"`)
-            const therapies = await this.knex("hospital_treatment_therapies_view").where({ hospital_treatment: treatment[0].id })
+            const therapies = await this.knex(this._hospitalTreatmentTherapies).where({ hospital_treatment: treatment[0].id })
             return this.toTreatmentWithTherapy(treatment[0], therapies)
         } catch (error) {
             throw new DBHospitalTreatmentQueryServiceError(`[treatment] - ${error.message}`);
@@ -23,7 +26,7 @@ export default class DBHospitalTreatmentQueryService extends KnexConnector imple
     }
     async treatments(): Promise<HospitalTreatmentReadModel[]> {
         try {
-            const rows = await this.knex("hospital_treatment_view")
+            const rows = await this.knex(this._hospitalTreatment)
             return rows.map(treatment => this.toTreatment(treatment))
         } catch (error) {
             throw new DBHospitalTreatmentQueryServiceError(`[treatments] - ${error.message}`);
@@ -31,8 +34,8 @@ export default class DBHospitalTreatmentQueryService extends KnexConnector imple
     }
     async treatmentsForMedicalCard(medicalCardId: Guid): Promise<HospitalTreatmentWithTherapiesReadModel[]> {
         try {
-            const treatments = await this.knex("hospital_treatment_view").where({ medical_card: medicalCardId.toString() })
-            const therapies = await this.knex("hospital_treatment_therapies_view").whereIn("hospital_treatment", treatments.map(t => t.id))
+            const treatments = await this.knex(this._hospitalTreatment).where({ medical_card: medicalCardId.toString() })
+            const therapies = await this.knex(this._hospitalTreatmentTherapies).whereIn("hospital_treatment", treatments.map(t => t.id))
             return treatments.map(treatment => this.toTreatmentWithTherapy(treatment, therapies.filter(t => t.hospital_treatment === treatment.id)))
         } catch (error) {
             throw new DBHospitalTreatmentQueryServiceError(`[treatments] - ${error.message}`);

@@ -12,7 +12,7 @@ export class DBHealthDataRepositoryError extends Error {
 export default class DBHealthDataRepository extends KnexConnector implements HealthDataRepository {
     async save(treatmentId: Guid, healthData: HealthData[]): Promise<void> {
         try {
-            await this.knex("health_data").insert(healthData.map(data => ({
+            await this.knex("health_center.health_data").insert(healthData.map(data => ({
                 hospital_treatment: treatmentId.toString(),
                 type: data.type().toString(),
                 value: data.value().toString(),

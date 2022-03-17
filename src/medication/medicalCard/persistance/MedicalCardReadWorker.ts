@@ -10,10 +10,7 @@ export default class MedicalCardReadWorker extends KnexConnector implements Read
 
     private readonly _groupName: string = "medical-card";
 
-    constructor(
-        private readonly _client: EventStoreDBClient,
-        private readonly _eventStore: MedicalCardEventStore
-    ) { super() }
+    constructor(private readonly _client: EventStoreDBClient) { super() }
 
     async work(): Promise<void> {
         try {
@@ -61,36 +58,17 @@ export default class MedicalCardReadWorker extends KnexConnector implements Read
         } catch (error) {
             console.log(`[READ WORKER] - [MedicalCardReadWorker] - ${error.message}`)
         }
-
     }
     private async createMedicalCard(id: string, data: any) {
-        return this.knex("medical_card").insert({ id: id, created_at: this.knex.fn.now() })
+        return this.knex("medication.medical_card").insert({ id: id, created_at: this.knex.fn.now() })
     }
     private async noteTreatment(id: string, data: any) {
-        return this.knex("noted_events").insert({ medical_card: id, type: "TREATMENT", event_id: data.treatmentId, created_at: this.knex.fn.now() })
+        return this.knex("medication.noted_events").insert({ medical_card: id, type: "TREATMENT", event_id: data.treatmentId, created_at: this.knex.fn.now() })
     }
     private async noteExamination(id: string, data: any) {
-        return this.knex("noted_events").insert({ medical_card: id, type: "EXAMINATION", event_id: data.examinationId, created_at: this.knex.fn.now() })
+        return this.knex("medication.noted_events").insert({ medical_card: id, type: "EXAMINATION", event_id: data.examinationId, created_at: this.knex.fn.now() })
     }
     private async noteTherapy(id: string, data: any) {
-        return this.knex("noted_events").insert({ medical_card: id, type: "THERAPY", event_id: data.therapyId, created_at: this.knex.fn.now() })
+        return this.knex("medication.noted_events").insert({ medical_card: id, type: "THERAPY", event_id: data.therapyId, created_at: this.knex.fn.now() })
     }
-
-
-
-
-
-
-    private async mm() {
-        const events = this._client.readStream<MedicalCardEvents>('', { direction: FORWARDS, fromRevision: START })
-        const medicalCard = new MedicalCard();
-        const readEvents: EventStoreEvent[] = []
-        for await (const resolvedEvent of events) {
-            if (!resolvedEvent.event) continue
-            readEvents.push(this._eventStore.event(resolvedEvent.event))
-        }
-        medicalCard.loadsFromHistory(readEvents)
-        return medicalCard;
-    }
-
 }

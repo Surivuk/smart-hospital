@@ -11,7 +11,7 @@ const HOSPITAL_TREATMENT_ID = new Guid("12314-456465-54564")
 
 function loadedTreatment() {
     const treatment = new HospitalTreatment();
-    treatment.loadsFromHistory([new HospitalTreatmentCreated(HOSPITAL_TREATMENT_ID, MEDICATION_CARD_ID, DIAGNOSIS)])
+    treatment.loadsFromHistory([new HospitalTreatmentCreated(HOSPITAL_TREATMENT_ID,  DIAGNOSIS)])
     return treatment
 }
 
@@ -19,7 +19,7 @@ describe('When hospital treatment created', () => {
     let treatment: HospitalTreatment;
 
     beforeAll(() => {
-        treatment = HospitalTreatment.create(HOSPITAL_TREATMENT_ID, MEDICATION_CARD_ID, DIAGNOSIS)
+        treatment = HospitalTreatment.create(HOSPITAL_TREATMENT_ID,  DIAGNOSIS)
     });
 
     test('should have only one uncommitted event', () => {
@@ -39,7 +39,7 @@ describe('When the treatment added new therapy', () => {
     beforeAll(() => {
         result = aggregateRootTestFixture({
             root: () => new HospitalTreatment(),
-            given: () => [new HospitalTreatmentCreated(HOSPITAL_TREATMENT_ID, MEDICATION_CARD_ID, DIAGNOSIS)],
+            given: () => [new HospitalTreatmentCreated(HOSPITAL_TREATMENT_ID,  DIAGNOSIS)],
             when: (root) => {
                 root.addTherapy(new Guid("therapy-123"))
             }
@@ -55,7 +55,7 @@ describe('When the treatment added therapy that already added', () => {
     beforeAll(() => {
         result = aggregateRootTestFixture({
             root: () => new HospitalTreatment(),
-            given: () => [new HospitalTreatmentCreated(HOSPITAL_TREATMENT_ID, MEDICATION_CARD_ID, DIAGNOSIS)],
+            given: () => [new HospitalTreatmentCreated(HOSPITAL_TREATMENT_ID,  DIAGNOSIS)],
             when: (root) => {
                 root.addTherapy(new Guid("therapy-123"))
                 root.addTherapy(new Guid("therapy-123"))
@@ -75,7 +75,7 @@ describe('When the therapy removed from treatment', () => {
     beforeAll(() => {
         result = aggregateRootTestFixture({
             root: () => new HospitalTreatment(),
-            given: () => [new HospitalTreatmentCreated(HOSPITAL_TREATMENT_ID, MEDICATION_CARD_ID, DIAGNOSIS)],
+            given: () => [new HospitalTreatmentCreated(HOSPITAL_TREATMENT_ID,  DIAGNOSIS)],
             when: (root) => {
                 root.removeTherapy(new Guid("therapy-123"))
             }
@@ -91,7 +91,7 @@ describe('When the therapy removed from treatment that do no have any therapy', 
     beforeAll(() => {
         result = aggregateRootTestFixture({
             root: () => new HospitalTreatment(),
-            given: () => [new HospitalTreatmentCreated(HOSPITAL_TREATMENT_ID, MEDICATION_CARD_ID, DIAGNOSIS)],
+            given: () => [new HospitalTreatmentCreated(HOSPITAL_TREATMENT_ID,  DIAGNOSIS)],
             when: (root) => {
                 root.removeTherapy(new Guid("therapy-123"))
             }
@@ -108,7 +108,7 @@ describe('When the therapy removed from treatment', () => {
         result = aggregateRootTestFixture({
             root: () => new HospitalTreatment(),
             given: () => [
-                new HospitalTreatmentCreated(HOSPITAL_TREATMENT_ID, MEDICATION_CARD_ID, DIAGNOSIS),
+                new HospitalTreatmentCreated(HOSPITAL_TREATMENT_ID,  DIAGNOSIS),
                 new TherapyAddedToHospitalTreatment(HOSPITAL_TREATMENT_ID, new Guid("therapy-123"))
             ],
             when: (root) => {
@@ -127,7 +127,7 @@ describe('When the therapy added after removing it from treatment', () => {
         result = aggregateRootTestFixture({
             root: () => new HospitalTreatment(),
             given: () => [
-                new HospitalTreatmentCreated(HOSPITAL_TREATMENT_ID, MEDICATION_CARD_ID, DIAGNOSIS),
+                new HospitalTreatmentCreated(HOSPITAL_TREATMENT_ID, DIAGNOSIS),
                 new TherapyAddedToHospitalTreatment(HOSPITAL_TREATMENT_ID, new Guid("therapy-123"))
             ],
             when: (root) => {

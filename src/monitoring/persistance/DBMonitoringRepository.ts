@@ -17,7 +17,7 @@ export class DBMonitoringRepositoryError extends Error {
 
 export default class DBMonitoringRepository extends KnexConnector implements MonitoringRepository {
 
-    private _table = "monitoring_device"
+    private _table = "monitoring.monitoring_device"
 
     async monitoring(id: Guid): Promise<Monitoring> {
         try {
