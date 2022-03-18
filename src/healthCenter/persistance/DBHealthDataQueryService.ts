@@ -11,13 +11,14 @@ export class DBHealthDataQueryServiceError extends Error {
 export default class DBHealthDataQueryService extends KnexConnector implements HealthDataQueryService {
     async healthDataPerDate(treatmentId: Guid, date: Date): Promise<HealthDataReadModel[]> {
         try {
-            const start = new Date(date)
-            start.setDate(start.getDate() - 1)
-            const end = new Date(date)
-            end.setDate(end.getDate() + 1)
-            const result = await this.knex.raw(`SELECT * 
+            const result = await this.knex.raw(`SELECT 
+                hospital_treatment,
+                type,
+                value, 
+                EXTRACT (EPOCH FROM timestamp) * 1000 AS timestamp
             FROM health_center.health_data 
-            WHERE hospital_treatment = ? AND CAST("timestamp"  AS DATE) = ?`, [treatmentId.toString(), `${this.adapt(date)}%`])
+            WHERE hospital_treatment = ? AND CAST("timestamp"  AS DATE) = ?
+            ORDER BY timestamp ASC`, [treatmentId.toString(), `${this.adapt(date)}%`])
 
             return result.rows.map((row: any) => ({ ...row }));
         } catch (error) {
@@ -27,8 +28,8 @@ export default class DBHealthDataQueryService extends KnexConnector implements H
 
     private adapt(date: Date) {
         const year = date.getFullYear()
-        const month = date.getMonth() + 1
-        const day = date.getDate()
-        return `${year}-${month}-${day}`
+        const month = `${date.getMonth() + 1}`
+        const day = `${date.getDate()}`
+        return `${year}-${month.length === 1 ? `0${month}` : month}-${day.length === 0 ? `0${day}` : day}`
     }
 }

@@ -11,6 +11,7 @@ import ExaminationQueryService from '@medication/examination/ExaminationQuerySer
 import HospitalTreatmentQueryService from '@medication/hospitalTreatment/HospitalTreatmentQueryService';
 import MedicalCardQueryService from '@medication/medicalCard/MedicalCardQueryService';
 import TherapyQueryService from '@medication/therapy/TherapyQueryService';
+import MonitoringQueryService from '@monitoring/MonitoringQueryService';
 
 export interface Dependency {
 
@@ -29,6 +30,7 @@ export interface Dependency {
     alarmNotificationQueryService: AlarmNotificationQueryService;
     examinationQueryService: ExaminationQueryService;
     medicamentQueryService: MedicamentQueryService;
+    monitoringQueryService: MonitoringQueryService;
 }
 
 export default interface DependencyContainer {

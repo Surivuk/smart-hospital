@@ -58,6 +58,7 @@ import { config } from 'dotenv';
 
 import DependencyContainer, { Dependency } from './DependencyContainer';
 import DBDoctorQueryService from '@adminstration/doctor/DBDoctorQueryService';
+import DBMonitoringQueryService from '@monitoring/persistance/DBMonitoringQueryService';
 
 
 export default class AppDependencyContainer implements DependencyContainer {
@@ -108,7 +109,8 @@ export default class AppDependencyContainer implements DependencyContainer {
             hospitalTreatmentQueryService: new DBHospitalTreatmentQueryService(),
             alarmNotificationQueryService: new DBAlarmNotificationQueryService(),
             examinationQueryService: new DBExaminationQueryService(),
-            medicamentQueryService: new DBMedicamentQueryService()
+            medicamentQueryService: new DBMedicamentQueryService(),
+            monitoringQueryService: new DBMonitoringQueryService()
         }
 
         this._httpServer = new HttpApi(this._dependency, this._config)
@@ -145,7 +147,7 @@ export default class AppDependencyContainer implements DependencyContainer {
             temperature: (timestamp, value) => new Temperature(timestamp, parseFloat(value)),
         }))
         this._alarmingEventHandlers = new AlarmingEventHandlers(alarmRepository, alarmNotificationRepository)
-        this._notificationEventHandlers = new NotificationEventHandlers(this._webSocket, this._dependency.alarmQueryService)
+        this._notificationEventHandlers = new NotificationEventHandlers(this._webSocket, this._dependency.alarmQueryService, this._dependency.hospitalTreatmentQueryService)
 
         // ReadWorkers
         this._readWorkers.push(new MedicalCardReadWorker(client))

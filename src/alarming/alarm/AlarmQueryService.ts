@@ -3,7 +3,6 @@ import Guid from "@common/Guid";
 export type AlarmReadModel = {
     id: string,
     hospitalTreatment: string
-    medicalCard: string
     name: string;
     trigger: {
         key: string;
