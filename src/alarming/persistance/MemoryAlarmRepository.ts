@@ -33,7 +33,10 @@ export default class MemoryAlarmRepository implements AlarmRepository {
             this._cache.clear()
             this._cache.set(treatmentId.toString(), alarms)
         }
-        return Array.from(this._cache.get(treatmentId.toString()) as Alarm[]);
+        const alarms = this._cache.get(treatmentId.toString())
+        if (alarms === undefined) return []
+        else
+            return Array.from(alarms as Alarm[]);
     }
 
     private addAlarm(alarm: Alarm) {
@@ -47,7 +50,7 @@ export default class MemoryAlarmRepository implements AlarmRepository {
             this._cache.set(treatmentId, [alarm]);
     }
     private removeAlarm(id: Guid) {
-       
+
         this._cache.forEach((alarms) => {
             const index = alarms.findIndex(alarm => alarm.id.equals(id))
             if (index !== -1)

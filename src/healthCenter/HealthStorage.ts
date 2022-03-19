@@ -27,27 +27,28 @@ export default class HealthStorage {
     }
 
     async storeHealthData(treatment: Guid, { type, timestamp, value }: ReceivedHealthData) {
+        const key = this.key(treatment, type);
         const healthData = this._healthDataFactory[type](timestamp, value);
         if (healthData === undefined) {
             console.log(`Not found any health data factory for provided type. Type: "${type}"`)
             return;
         }
 
-        const lastReceivedValue = this._lastReceivedValue.get(type);
+        const lastReceivedValue = this._lastReceivedValue.get(key);
         const lastData = lastReceivedValue !== undefined ? this.healthData(type, lastReceivedValue) : undefined;
 
         const forStoring: HealthData[] = this.findDataForStorage(lastData, healthData)
         if (forStoring.length > 0) {
             await this._repository.save(treatment, forStoring)
             this._lastSavedTimestamp = forStoring[forStoring.length - 1].timestamp()
-            this._lastReceivedValue.set(type, { timestamp, value })
+            this._lastReceivedValue.set(key, { timestamp, value })
         }
     }
 
     private healthData(type: string, lastReceivedValue: { timestamp: number; value: string; }) {
         const data = this._healthDataFactory[type](lastReceivedValue.timestamp, lastReceivedValue.value);
         if (data === undefined) {
-            throw new Error(`Not found factory for provided data. Type: ${type}`)
+            throw new Error(`Not found factory for provided data. Key: ${type}`)
         }
         return data;
     }
@@ -68,5 +69,8 @@ export default class HealthStorage {
             return [lastData, newData]
         }
         return []
+    }
+    private key(treatment: Guid, type: string) {
+        return `${treatment.toString()}_${type}`
     }
 }
