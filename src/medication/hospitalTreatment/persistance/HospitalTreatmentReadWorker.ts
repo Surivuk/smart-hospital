@@ -69,7 +69,22 @@ export default class HospitalTreatmentReadWorker extends KnexConnector implement
         return this.knex("medication.hospital_treatment").insert({ id: id, diagnosis: data.diagnosis, created_at: this.knex.fn.now() })
     }
     private async therapyAdded(id: string, data: any) {
-        return this.knex("medication.hospital_treatment_therapies").insert({ therapy: data.therapyId, hospital_treatment: id, created_at: this.knex.fn.now() })
+        let counter = 3;
+        const action = async () => {
+            try {
+                await this.knex("medication.hospital_treatment_therapies").insert({
+                    therapy: data.therapyId,
+                    hospital_treatment: id,
+                    created_at: this.knex.fn.now()
+                })
+            }
+            catch (error) {
+                if (counter === 0) return;
+                counter--;
+                setTimeout(() => action(), 1000)
+            }
+        }
+        return action()
     }
     private async therapyRemoved(id: string, data: any) {
         return this.knex("medication.hospital_treatment_therapies").where({ therapy: data.therapyId, hospital_treatment: id }).delete()
