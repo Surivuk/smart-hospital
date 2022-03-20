@@ -15,7 +15,7 @@ export default class DBHealthDataQueryService extends KnexConnector implements H
                 hospital_treatment,
                 type,
                 value, 
-                EXTRACT (EPOCH FROM timestamp) * 1000 AS timestamp
+                ROUND(EXTRACT (EPOCH FROM timestamp) * 1000) AS timestamp
             FROM health_center.health_data 
             WHERE hospital_treatment = ? AND CAST("timestamp"  AS DATE) = ?
             ORDER BY timestamp ASC`, [treatmentId.toString(), `${this.adapt(date)}%`])
