@@ -1,7 +1,5 @@
-// import { config } from "dotenv"
-
-// config();
-require("dotenv").config()
+import { config } from "dotenv"
+config();
 
 const env = process.env
 
